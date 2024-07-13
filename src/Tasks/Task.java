@@ -1,34 +1,54 @@
-public class SingleTask {
+package Tasks;
+
+import java.util.Objects;
+
+public class Task {
     protected String title;
     protected String description;
     protected int id;
     protected TaskStatus status;
 
-    public SingleTask(String title, String description, TaskStatus status) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
+    public Task(String title, String description) {
+        this(title, description, TaskStatus.NEW, 0);
     }
 
-    public SingleTask(String title, String description, TaskStatus status, int id) {
+    public Task(String title, String description, TaskStatus status, int id) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.id = id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTitle(String title) {
+        this.title = title;
     }
-    public int getId() {
-        return id;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setStatus (TaskStatus status) {
         this.status = status;
     }
+
     public TaskStatus getStatus () {
         return status;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -45,19 +65,13 @@ public class SingleTask {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        SingleTask task = (SingleTask) obj;
+        Task task = (Task) obj;
         return id == task.id;
-    }// По условию TaskManager должен считать задачи с одинаковым id одним и тем же.
+    }// По условию Managers.TaskManager должен считать задачи с одинаковым id одним и тем же.
     // Видимо даже если у них другие параметры каким-то образом не совпадают.
 
     @Override
     public int hashCode() {
-        int hash = 17;
-
-        if (title != null) {
-            hash = hash + title.hashCode();
-        }
-        hash = hash * 31 + id;
-        return hash;
+        return Objects.hash(id);
     }
 }

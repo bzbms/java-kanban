@@ -1,51 +1,67 @@
+import Managers.TaskManager;
+import Tasks.Epic;
+import Tasks.Subtask;
+import Tasks.Task;
+import Tasks.TaskStatus;
+
 public class Main {
 
     public static void main(String[] args) {
+        TaskManager TM = new TaskManager();
 
-        SingleTask TASK1 = new SingleTask("Zadacha", "Opisanie", TaskStatus.NEW);
-        SingleTask TASK2 = new SingleTask("Zadacha2", "Opisanie", TaskStatus.NEW);
-        SingleTask TASK3 = new SingleTask("Zadacha", "Opisanie", TaskStatus.NEW);
+        Task TASK1 = new Task("Zadacha", "Opisanie");
+        Task TASK2 = new Task("Zadacha2", "Opisanie");
+        Task TASK3 = new Task("Zadacha", "Opisanie");
 
-        EpicTask TASKE1 = new EpicTask("1EPICZadacha", "Opisanie", TaskStatus.NEW);
-        EpicTask TASKE2 = new EpicTask("2EPICZadacha", "Opisanie", TaskStatus.NEW);
-        EpicTask TASKE3 = new EpicTask("3EPICZadacha", "Opisanie", TaskStatus.NEW);
+        Epic TASKE1 = new Epic("1EPICZadacha", "Opisanie");
+        Epic TASKE2 = new Epic("2EPICZadacha", "Opisanie");
+        Epic TASKE3 = new Epic("3EPICZadacha", "Opisanie");
 
         System.out.println("Добавления Эпиков, должно возвращать ID:");
-        System.out.println(TaskManager.addTask(TASKE1));
-        System.out.println(TaskManager.addTask(TASKE2));
-        System.out.println(TaskManager.addTask(TASKE3));
+        System.out.println(TM.addTask(TASKE1));
+        System.out.println(TM.addTask(TASKE2));
+        System.out.println(TM.addTask(TASKE3));
 
-        SubTask st11 = new SubTask("1SubZadacha", "Opisanie", TaskStatus.NEW, 1);
-        SubTask st12 = new SubTask("1Sub2Zadacha", "Opisanie", TaskStatus.NEW, 1);
-        SubTask st13 = new SubTask("1Sub3Zadacha", "Opisanie", TaskStatus.NEW, 1);
+/*
+        Tasks.Subtask st11 = new Tasks.Subtask("1SubZadacha", "Opisanie", Tasks.TaskStatus.NEW, 1);
+        Tasks.Subtask st12 = new Tasks.Subtask("1Sub2Zadacha", "Opisanie", Tasks.TaskStatus.NEW, 1);
+        Tasks.Subtask st13 = new Tasks.Subtask("1Sub3Zadacha", "Opisanie", Tasks.TaskStatus.NEW, 1);
 
-        SubTask st21 = new SubTask("2SubZadacha", "Opisanie", TaskStatus.DONE, 2);
-        SubTask st22 = new SubTask("2Sub2Zadacha", "Opisanie", TaskStatus.DONE, 2);
-        SubTask st23 = new SubTask("2Sub3Zadacha", "Opisanie", TaskStatus.DONE, 2);
+        Tasks.Subtask st21 = new Tasks.Subtask("2SubZadacha", "Opisanie", Tasks.TaskStatus.DONE, 2);
+        Tasks.Subtask st22 = new Tasks.Subtask("2Sub2Zadacha", "Opisanie", Tasks.TaskStatus.DONE, 2);
+        Tasks.Subtask st23 = new Tasks.Subtask("2Sub3Zadacha", "Opisanie", Tasks.TaskStatus.DONE, 2);
+*/
 
-        SubTask st31 = new SubTask("3SubZadacha", "Opisanie", TaskStatus.NEW, 3);
-        SubTask st32 = new SubTask("3Sub2Zadacha", "Opisanie", TaskStatus.DONE, 3);
-        SubTask st33 = new SubTask("3Sub3Zadacha", "Opisanie", TaskStatus.NEW, 3);
+        Subtask st31 = new Subtask("3SubZadacha", "Opisanie", TaskStatus.NEW, 3, 4);
+        Subtask st32 = new Subtask("3Sub2Zadacha", "Opisanie", TaskStatus.DONE, 3, 5);
+        Subtask st33 = new Subtask("3Sub3Zadacha", "Opisanie", TaskStatus.NEW, 3, 6);
 
+
+/*
         // Добавления Подзадач:
-        TaskManager.addTask(st11);
-        TaskManager.addTask(st12);
-        TaskManager.addTask(st13);
+        Managers.TaskManager.addTask(st11);
+        Managers.TaskManager.addTask(st12);
+        Managers.TaskManager.addTask(st13);
 
-        TaskManager.addTask(st21);
-        TaskManager.addTask(st22);
-        TaskManager.addTask(st23);
+        Managers.TaskManager.addTask(st21);
+        Managers.TaskManager.addTask(st22);
+        Managers.TaskManager.addTask(st23);
+*/
 
-        TaskManager.addTask(st31);
-        TaskManager.addTask(st32);
-        TaskManager.addTask(st33);
+        TM.addTask(st31);
+        TM.addTask(st32);
+        TM.addTask(st33);
+
         System.out.println("Вывод Эпиков для проверки Статусов:");
-        System.out.println(TASKE1);
-        System.out.println(TASKE2);
+  /*      System.out.println(TASKE1);
+        System.out.println(TASKE2);*/
         System.out.println(TASKE3);
         System.out.println();
         System.out.println("Получение списка Подзадач Эпика:");
-        System.out.println(TaskManager.getEpicSubTasks(2));
-
+        System.out.println(TM.getEpicSubtasks(3));
+        System.out.println(TM.getAllSubtasks());
+        System.out.println();
+        TM.removeEpic(3);
+        System.out.println(TM.getAllSubtasks());
     }
 }
