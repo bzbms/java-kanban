@@ -6,19 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    static final short historyLimit = 10;
+    private static final short HISTORY_LIMIT = 10;
     private final List<Task> history = new ArrayList<>();
 
     @Override
-    public <T extends Task> void addTask(T task) { // Можем добавлять любые экземпляры классов, наследуемых от Task.
-        history.add(task);
-        while (history.size() > historyLimit) {
-            history.removeFirst(); // Чистим историю от первых записей, пока их там более 10.
+    public void addTask(Task task) {
+        if (task != null) {
+            history.add(task);
+        } else {
+            return;
+        }
+        if (history.size() > HISTORY_LIMIT) {
+            history.removeFirst();
         }
     }
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        final List<Task> historyCopy = history;
+        return historyCopy;
     }
 }

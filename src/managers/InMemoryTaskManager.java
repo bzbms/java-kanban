@@ -3,6 +3,8 @@ package managers;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskStatus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
         return id;
     }
 
-    // У меня сделано так, что Подзадачи не могут существовать отдельно от Эпика, потому:
+    // Подзадачи не должны существовать отдельно от Эпика, потому:
     @Override
     public int addTask(Subtask task) {
         Epic epic = epics.get(task.getEpicId()); // 1. Проверяется, есть ли Эпик с ID, равным epicId у Подзадачи.
@@ -152,7 +154,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask removeSubtask(int id) {
-        // С последней проверки ТЗ-4 этот метод доработан:
         // Вся Подзадача временно сохраняется при удалении.
         // ID Подзадачи удаляется из Списка Эпика, иначе возникает ошибка при обновлении Статуса.
         if (subtasks.get(id) == null) {
@@ -178,8 +179,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllSubtasks() {
-        // С последней проверки ТЗ-4 этот метод доработан:
-        // Подзадачи удалялись, а статус Эпика не обновлялся, теперь же исправлено.
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.clearSubtaskIds();
@@ -190,6 +189,36 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory(){
         return historyManager.getHistory();
+    }
+
+    private void updateEpicStatus(Epic epic) {
+        ArrayList<Subtask> subtasksToCheck = getEpicSubtasks(epic.getId());
+
+        if (subtasksToCheck.isEmpty()) {
+            epic.setStatus(TaskStatus.NEW);
+            return;
+        }
+
+        boolean isNEW = false;
+        boolean isDONE = false;
+        for (Subtask subTask : subtasksToCheck) {
+            if (subTask.getStatus() == TaskStatus.IN_PROGRESS) {
+                epic.setStatus(TaskStatus.IN_PROGRESS);
+                return; // Если встретится Подзадача с IN_PROGRESS, то дальнейшие проверки делать не нужно.
+            }
+            if (subTask.getStatus() == TaskStatus.NEW) { // И это значит, что далее может прийти только 2 Статуса.
+                isNEW = true;
+            } else {
+                isDONE = true;
+            }
+        }
+        if (!isNEW) {
+            epic.setStatus(TaskStatus.DONE);
+        } else if (!isDONE) {
+            epic.setStatus(TaskStatus.NEW);
+        } else {
+            epic.setStatus(TaskStatus.IN_PROGRESS);
+        }
     }
 
 }
