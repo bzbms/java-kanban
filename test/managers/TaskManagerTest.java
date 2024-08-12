@@ -24,7 +24,7 @@ class TaskManagerTest {
         taskManager = Managers.getDefaultManager();
         task = new Task("TTask", "DescriptionT");
         epic = new Epic("Etask", "DescriptionE");
-        subtask = new Subtask("Stask", "DescriptionS",  2);
+        subtask = new Subtask("Stask", "DescriptionS", 2);
 
         taskManager.addTask(task);
         taskManager.addTask(epic);
@@ -37,15 +37,15 @@ class TaskManagerTest {
 
         historymanager.addTask(task);
         assertNotNull(taskManager.getTask(1), "Менеджер задач не работает.");
-        assertNotNull(historymanager.getHistory().get(0),"Менеджер истории не работает.");
+        assertNotNull(historymanager.getHistory().get(0), "Менеджер истории не работает.");
     }
 
 
     @Test
     void gettingShouldReturnSameTasks() {
         assertEquals(task, taskManager.getTask(1), "Задача не та же.");
-        assertEquals(epic, taskManager.getEpic(2),"Эпик не тот же.");
-        assertEquals(subtask, taskManager.getSubtask(3),"Подзадача не та же.");
+        assertEquals(epic, taskManager.getEpic(2), "Эпик не тот же.");
+        assertEquals(subtask, taskManager.getSubtask(3), "Подзадача не та же.");
     }
 
     @Test
@@ -55,27 +55,30 @@ class TaskManagerTest {
     }
 
     @Test
-    void updatingShouldReturnNotNegative() {
+    void updatingShouldReturnNewTask() {
         final Task task2 = new Task("TTask2", "Description", TaskStatus.DONE, 1);
-        final Epic epic2 = new Epic("Etask2", "Description", TaskStatus.DONE, 2);
+        final Epic epic2 = new Epic("Etask2", "Description2", TaskStatus.DONE, 2);
         final Subtask subtask2 = new Subtask("Stask2", "Description", TaskStatus.DONE, 2, 3);
+        final String taskTitle = task2.getTitle();
+        final String epicDescription = epic2.getDescription();
+        final TaskStatus subtaskStatus = subtask2.getStatus();
 
-        final int taskId = taskManager.updateTask(task2);
-        final int epicId = taskManager.updateTask(epic2);
-        final int subtaskId = taskManager.updateTask(subtask2);
-        assertEquals(1, taskId, "Задача не обновилась.");
-        assertEquals(2, epicId, "Эпик не обновился.");
-        assertEquals(3, subtaskId, "Подзадача не обновилась.");
+        taskManager.updateTask(task2);
+        taskManager.updateTask(epic2);
+        taskManager.updateTask(subtask2);
+        assertEquals(taskTitle, taskManager.getTask(1).getTitle(), "Название задачи не обновилось.");
+        assertEquals(epicDescription, taskManager.getEpic(2).getDescription(), "Описание эпика не обновилось.");
+        assertEquals(subtaskStatus, taskManager.getSubtask(3).getStatus(), "Статус подзадачи не обновился.");
     }
 
     @Test
     void removingShouldReturnSameTasksAndNull() {
         assertEquals(task, taskManager.removeTask(1), "Задача не та же.");
         assertNull(taskManager.getTask(1), "Задача не удалилась.");
-        assertEquals(subtask, taskManager.removeSubtask(3),"Подзадача не та же.");
-        assertNull(taskManager.getSubtask(3),"Подзадача не удалилась.");
-        assertEquals(epic, taskManager.removeEpic(2),"Эпик не тот же.");
-        assertNull(taskManager.getEpic(2),"Эпик не удалился.");
+        assertEquals(subtask, taskManager.removeSubtask(3), "Подзадача не та же.");
+        assertNull(taskManager.getSubtask(3), "Подзадача не удалилась.");
+        assertEquals(epic, taskManager.removeEpic(2), "Эпик не тот же.");
+        assertNull(taskManager.getEpic(2), "Эпик не удалился.");
     }
 
     @Test
@@ -83,9 +86,9 @@ class TaskManagerTest {
         taskManager.removeAllTasks();
         assertNull(taskManager.getTask(1), "Задача не удалилась.");
         taskManager.removeAllSubtasks();
-        assertNull(taskManager.getSubtask(3),"Подзадача не удалилась.");
+        assertNull(taskManager.getSubtask(3), "Подзадача не удалилась.");
         taskManager.removeAllEpics();
-        assertNull(taskManager.getEpic(2),"Эпик не удалился.");
+        assertNull(taskManager.getEpic(2), "Эпик не удалился.");
     }
 
     @Test
@@ -105,9 +108,9 @@ class TaskManagerTest {
         taskManager.addTask(epicWithId);
         taskManager.addTask(subtaskWithId);
         assertEquals(taskWithId, taskManager.getTask(4), "Задача с неверным ID.");
-        assertEquals(epicWithId, taskManager.getEpic(5),"Эпик с неверным ID.");
-        assertEquals(subtaskWithId, taskManager.getSubtask(6),"Подзадача с неверным ID.");
-        assertEquals(subtaskWithId, taskManager.getEpicSubtasks(2).get(1),"Подзадача не в том месте.");
+        assertEquals(epicWithId, taskManager.getEpic(5), "Эпик с неверным ID.");
+        assertEquals(subtaskWithId, taskManager.getSubtask(6), "Подзадача с неверным ID.");
+        assertEquals(subtaskWithId, taskManager.getEpicSubtasks(2).get(1), "Подзадача не в том месте.");
     }
 
     @Test
