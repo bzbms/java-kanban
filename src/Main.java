@@ -1,3 +1,4 @@
+import managers.HistoryManager;
 import managers.Managers;
 import managers.TaskManager;
 import tasks.Epic;
@@ -18,9 +19,9 @@ public class Main {
         Epic TASKE2 = new Epic("2EPICZadacha", "Opisanie");
         Epic TASKE3 = new Epic("3EPICZadacha", "Opisanie");
 
-        Subtask st41 = new Subtask("4SubZadacha", "Opisanie", TaskStatus.NEW, 4, 4);
-        Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", TaskStatus.DONE, 4, 5);
-        Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", TaskStatus.NEW, 5, 6);
+        Subtask st41 = new Subtask("4SubZadacha", "Opisanie", 4);
+        Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", 4);
+        Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", 5);
 
         System.out.println(TM.addTask(TASK1));
         System.out.println(TM.addTask(TASK2));
@@ -33,6 +34,9 @@ public class Main {
         System.out.println(TM.addTask(st41));
         System.out.println(TM.addTask(st42));
         System.out.println(TM.addTask(st51));
+
+        st42 = new Subtask("4Sub2Zadacha", "Opisanie", TaskStatus.DONE, 4, 8);
+        TM.updateTask(st42);
 
         TM.getTask(2);
         TM.getEpic(4);
@@ -47,7 +51,15 @@ public class Main {
         TM.getEpic(4);
         TM.getSubtask(7);
 
-        printAllTasks(TM); // Показать всё это безобразие. :В
+        printAllTasks(TM);
+
+        TM.removeTask(1);
+
+        printAllTasks(TM);
+
+        TM.removeEpic(4);
+
+        printAllTasks(TM);
     }
 
     private static void printAllTasks(TaskManager manager) {
@@ -71,8 +83,7 @@ public class Main {
         System.out.println("История:");
         for (int i = 0; i < manager.getHistory().size(); i++) {
             Task task = manager.getHistory().get(i);
-            System.out.println((i+1) + ". " + task);
+            System.out.println((i + 1) + ". " + task);
         }
-
     }
 }

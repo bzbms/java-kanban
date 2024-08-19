@@ -1,9 +1,4 @@
 package managers;
-/*
-Привет, Сергей.
-
-Всё указанное исправлял, думаю получилось. Спасибо за теоретические разъяснения.
-*/
 
 import tasks.Epic;
 import tasks.Subtask;
@@ -53,6 +48,4 @@ public interface TaskManager {
     void removeAllSubtasks();
 
     List<Task> getHistory();
-
-    private void updateEpicStatus(Epic epic) {}
 }
