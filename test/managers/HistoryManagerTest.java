@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class HistoryManagerTest {
-    static final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Test
     void addingToHistory() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
         Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe");
 
         historyManager.addTask(task);
@@ -26,6 +27,7 @@ class HistoryManagerTest {
 
     @Test
     void removingFromHistory() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
         Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe");
 
         historyManager.addTask(task);
@@ -62,5 +64,67 @@ class HistoryManagerTest {
         assertEquals(check, taskManager.getHistory(), "История заполняется неверно.");
     }
 
+    @Test
+    void removeTaskFromBegin() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        Task task1 = new Task("T1", "", TaskStatus.NEW, 1);
+        Task task2 = new Task("T2", "", TaskStatus.NEW, 2);
+        Task task3 = new Task("T3", "", TaskStatus.NEW, 3);
 
+        historyManager.addTask(task1);
+        historyManager.addTask(task2);
+        historyManager.addTask(task3);
+        historyManager.removeTask(1);
+
+        List<Task> check = new ArrayList<>();
+        check.add(task2);
+        check.add(task3);
+
+        assertEquals(check, historyManager.getHistory(), "Первая задача удалилась неправильно.");
+    }
+
+    @Test
+    void removeTaskFromMiddle() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        Task task1 = new Task("T1", "", TaskStatus.NEW, 1);
+        Task task2 = new Task("T2", "", TaskStatus.NEW, 2);
+        Task task3 = new Task("T3", "", TaskStatus.NEW, 3);
+
+        historyManager.addTask(task1);
+        historyManager.addTask(task2);
+        historyManager.addTask(task3);
+        historyManager.removeTask(2);
+
+        List<Task> check = new ArrayList<>();
+        check.add(task1);
+        check.add(task3);
+
+        assertEquals(check, historyManager.getHistory(), "Задача из середины удалилась неправильно.");
+    }
+
+    @Test
+    void removeTaskFromEnd() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        Task task1 = new Task("T1", "", TaskStatus.NEW, 1);
+        Task task2 = new Task("T2", "", TaskStatus.NEW, 2);
+        Task task3 = new Task("T3", "", TaskStatus.NEW, 3);
+
+        historyManager.addTask(task1);
+        historyManager.addTask(task2);
+        historyManager.addTask(task3);
+        historyManager.removeTask(3);
+
+        List<Task> check = new ArrayList<>();
+        check.add(task1);
+        check.add(task2);
+
+        assertEquals(check, historyManager.getHistory(), "Последняя задача удалилась неправильно.");
+    }
+
+    @Test
+    void removingFromEmptyHistoryShouldHaveNoError() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        assertTrue(historyManager.getHistory().isEmpty(), "История не была пуста.");
+        historyManager.removeTask(0);
+    }
 }

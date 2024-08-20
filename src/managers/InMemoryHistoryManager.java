@@ -40,55 +40,46 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    private final List<Task> history = new ArrayList<>();
     private final HashMap<Integer, Node> nodesByTaskIds = new HashMap<>();
-    private static Node firstAddition;
-    private static Node lastAddition;
+    private Node firstAddition;
+    private Node lastAddition;
 
     @Override
     public void addTask(Task task) {
         if (task == null) {
             return;
         }
-
-        final Node currentLast = lastAddition; // 1. Запоминаем последний узел
-
-        if (currentLast != null && currentLast.task.equals(task)) {
-            return; // Если задача не первая (избегаем Exception-ошибки) и повторяется подряд, то не добавляем её
-        }
-
-        if (nodesByTaskIds.get(task.getId()) != null) {
-            // Если приходящая Задача уже была добавлена в узлы истории...        узлы истории, интересно звучит :В ,
-            // то перед добавлением надо удалить её предыдущий дубликат из списка
-            removeNode(nodesByTaskIds.get(task.getId()));
-        }
-
-        final Node newNode = new Node(currentLast, task, null); // 2. Чтобы добавить ссылку на последний Узел в новый
-        lastAddition = newNode; // 3. И затем новый становится последним
-        if (currentLast == null) { // Если же это 1-ое добавление (в последнем ничего не было),
-            firstAddition = newNode; // то надо запомнить Узел в голове.
-        } else {
-            currentLast.next = newNode; // 4. Иначе предпоследнему Узлу надо занести ссылку на добавляемый
-        }
-        nodesByTaskIds.put(task.getId(), newNode);
+        removeNode(nodesByTaskIds.get(task.getId()));
+        addNode(task);
     }
 
     @Override
     public void removeTask(int id) {
-        if (nodesByTaskIds.get(id) == null) {
-            return; // Если между добавлением и удалением задач не сделать .get, то история останется пуста и removeNode() не нужен.
-        }
         removeNode(nodesByTaskIds.get(id));
     }
 
     @Override
     public List<Task> getHistory() {
-        history.clear();
-        history.addAll(fillHistory());
-        return new ArrayList<>(history);
+        return new ArrayList<>(fillHistory());
+    }
+
+    private void addNode(Task task) {
+        final Node newNode = new Node(lastAddition, task, null);
+
+        if (lastAddition == null) { // Если это 1-е добавление (в последнем ничего не было),
+            firstAddition = newNode; // то надо запомнить Узел в голове.
+        } else {
+            lastAddition.next = newNode; // Иначе предпоследнему Узлу надо занести ссылку на добавляемый
+        }
+        lastAddition = newNode; // И затем новый становится последним
+        nodesByTaskIds.put(task.getId(), newNode);
     }
 
     private void removeNode(Node node) {
+        if (node == null) {
+            return;
+        }
+
         Node shiftNode = nodesByTaskIds.remove(node.task.getId());
 
         if (shiftNode.next == null && shiftNode.prev == null) { // Если удаляемый Узел - единственный
@@ -111,7 +102,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         shiftNode.next.prev = shiftNode.prev; // А в последующем - ссылку на предыдущий
     }
 
-    private static ArrayList<Task> fillHistory() {
+    private ArrayList<Task> fillHistory() {
         ArrayList<Task> tasks = new ArrayList<>();
         Node node = firstAddition; // Обращаемся к первому Узлу списка
         while (node != null) { // Пока Узел не пустой
