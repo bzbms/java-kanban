@@ -8,7 +8,7 @@ import tasks.TaskStatus;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager TM = Managers.getDefaultManager();
+        TaskManager taskManager = Managers.getDefaultManager();
 
         Task task1 = new Task("Zadacha", "Opisanie");
         Task task2 = new Task("Zadacha2", "Opisanie");
@@ -22,43 +22,43 @@ public class Main {
         Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", 4);
         Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", 5);
 
-        System.out.println(TM.addTask(task1));
-        System.out.println(TM.addTask(task2));
-        System.out.println(TM.addTask(task3));
+        System.out.println(taskManager.addTask(task1));
+        System.out.println(taskManager.addTask(task2));
+        System.out.println(taskManager.addTask(task3));
 
-        System.out.println(TM.addTask(taskE1));
-        System.out.println(TM.addTask(taskE2));
-        System.out.println(TM.addTask(taskE3));
+        System.out.println(taskManager.addTask(taskE1));
+        System.out.println(taskManager.addTask(taskE2));
+        System.out.println(taskManager.addTask(taskE3));
 
-        System.out.println(TM.addTask(st41));
-        System.out.println(TM.addTask(st42));
-        System.out.println(TM.addTask(st51));
+        System.out.println(taskManager.addTask(st41));
+        System.out.println(taskManager.addTask(st42));
+        System.out.println(taskManager.addTask(st51));
 
         st42 = new Subtask("4Sub2Zadacha", "Opisanie", TaskStatus.DONE, 4, 8);
-        TM.updateTask(st42);
+        taskManager.updateTask(st42);
 
-        TM.getTask(2);
-        TM.getEpic(4);
-        TM.getSubtask(7);
-        TM.getTask(1);
-        TM.getEpic(5);
-        TM.getSubtask(8);
-        TM.getTask(3);
-        TM.getEpic(6);
-        TM.getSubtask(9);
-        TM.getTask(2);
-        TM.getEpic(4);
-        TM.getSubtask(7);
+        taskManager.getTask(2);
+        taskManager.getEpic(4);
+        taskManager.getSubtask(7);
+        taskManager.getTask(1);
+        taskManager.getEpic(5);
+        taskManager.getSubtask(8);
+        taskManager.getTask(3);
+        taskManager.getEpic(6);
+        taskManager.getSubtask(9);
+        taskManager.getTask(2);
+        taskManager.getEpic(4);
+        taskManager.getSubtask(7);
 
-        printAllTasks(TM);
+        printAllTasks(taskManager);
 
-        TM.removeTask(1);
+        taskManager.removeTask(1);
 
-        printAllTasks(TM);
+        printAllTasks(taskManager);
 
-        TM.removeEpic(4);
+        taskManager.removeEpic(4);
 
-        printAllTasks(TM);
+        printAllTasks(taskManager);
     }
 
     private static void printAllTasks(TaskManager manager) {
