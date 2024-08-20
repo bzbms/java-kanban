@@ -67,8 +67,7 @@ public class Task {
         if (obj == null || getClass() != obj.getClass()) return false;
         Task task = (Task) obj;
         return id == task.id;
-    }// По условию TaskManager должен считать задачи с одинаковым id одним и тем же.
-    // Видимо даже если у них другие параметры каким-то образом не совпадают.
+    }
 
     @Override
     public int hashCode() {
