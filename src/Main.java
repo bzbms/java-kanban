@@ -1,4 +1,3 @@
-import managers.HistoryManager;
 import managers.Managers;
 import managers.TaskManager;
 import tasks.Epic;
@@ -11,25 +10,25 @@ public class Main {
     public static void main(String[] args) {
         TaskManager TM = Managers.getDefaultManager();
 
-        Task TASK1 = new Task("Zadacha", "Opisanie");
-        Task TASK2 = new Task("Zadacha2", "Opisanie");
-        Task TASK3 = new Task("Zadacha3", "Opisanie");
+        Task task1 = new Task("Zadacha", "Opisanie");
+        Task task2 = new Task("Zadacha2", "Opisanie");
+        Task task3 = new Task("Zadacha3", "Opisanie");
 
-        Epic TASKE1 = new Epic("1EPICZadacha", "Opisanie");
-        Epic TASKE2 = new Epic("2EPICZadacha", "Opisanie");
-        Epic TASKE3 = new Epic("3EPICZadacha", "Opisanie");
+        Epic taskE1 = new Epic("1EPICZadacha", "Opisanie");
+        Epic taskE2 = new Epic("2EPICZadacha", "Opisanie");
+        Epic taskE3 = new Epic("3EPICZadacha", "Opisanie");
 
         Subtask st41 = new Subtask("4SubZadacha", "Opisanie", 4);
         Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", 4);
         Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", 5);
 
-        System.out.println(TM.addTask(TASK1));
-        System.out.println(TM.addTask(TASK2));
-        System.out.println(TM.addTask(TASK3));
+        System.out.println(TM.addTask(task1));
+        System.out.println(TM.addTask(task2));
+        System.out.println(TM.addTask(task3));
 
-        System.out.println(TM.addTask(TASKE1));
-        System.out.println(TM.addTask(TASKE2));
-        System.out.println(TM.addTask(TASKE3));
+        System.out.println(TM.addTask(taskE1));
+        System.out.println(TM.addTask(taskE2));
+        System.out.println(TM.addTask(taskE3));
 
         System.out.println(TM.addTask(st41));
         System.out.println(TM.addTask(st42));

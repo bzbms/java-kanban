@@ -6,7 +6,6 @@ import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,13 +54,7 @@ class HistoryManagerTest {
         taskManager.getEpic(3);
         taskManager.getTask(1);
 
-        List<Task> check = new ArrayList<>();
-        check.add(taskS1);
-        check.add(taskE1);
-        check.add(taskE2);
-        check.add(task1);
-
-        assertEquals(check, taskManager.getHistory(), "История заполняется неверно.");
+        assertEquals(List.of(taskS1, taskE1, taskE2, task1), taskManager.getHistory(), "История заполняется неверно.");
     }
 
     @Test
@@ -76,11 +69,7 @@ class HistoryManagerTest {
         historyManager.addTask(task3);
         historyManager.removeTask(1);
 
-        List<Task> check = new ArrayList<>();
-        check.add(task2);
-        check.add(task3);
-
-        assertEquals(check, historyManager.getHistory(), "Первая задача удалилась неправильно.");
+        assertEquals(List.of(task2, task3), historyManager.getHistory(), "Первая задача удалилась неправильно.");
     }
 
     @Test
@@ -95,11 +84,7 @@ class HistoryManagerTest {
         historyManager.addTask(task3);
         historyManager.removeTask(2);
 
-        List<Task> check = new ArrayList<>();
-        check.add(task1);
-        check.add(task3);
-
-        assertEquals(check, historyManager.getHistory(), "Задача из середины удалилась неправильно.");
+        assertEquals(List.of(task1, task3), historyManager.getHistory(), "Задача из середины удалилась неправильно.");
     }
 
     @Test
@@ -114,11 +99,7 @@ class HistoryManagerTest {
         historyManager.addTask(task3);
         historyManager.removeTask(3);
 
-        List<Task> check = new ArrayList<>();
-        check.add(task1);
-        check.add(task2);
-
-        assertEquals(check, historyManager.getHistory(), "Последняя задача удалилась неправильно.");
+        assertEquals(List.of(task1, task2), historyManager.getHistory(), "Последняя задача удалилась неправильно.");
     }
 
     @Test
