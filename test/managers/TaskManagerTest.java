@@ -40,7 +40,6 @@ class TaskManagerTest {
         assertNotNull(historymanager.getHistory().get(0), "Менеджер истории не работает.");
     }
 
-
     @Test
     void gettingShouldReturnSameTasks() {
         assertEquals(task, taskManager.getTask(1), "Задача не та же.");

@@ -34,13 +34,15 @@ public class Epic extends Task {
         subtaskIds.clear();
     }
 
-    public void setStatus(TaskStatus status){ // ТЗ-6. Ограничить возможность использовать методы .set
+    public void setStatus(TaskStatus status) { // ТЗ-6. Ограничить возможность использовать методы .set
         System.out.println("Статус Эпика должен высчитываться автоматически.");
     }
-    public void updateStatus(List<Subtask> subtasksToCheck){
+
+    public void updateStatus(List<Subtask> subtasksToCheck) {
         this.status = defineStatus(subtasksToCheck);
     }
-    private TaskStatus defineStatus(List<Subtask> subtasksToCheck){
+
+    private TaskStatus defineStatus(List<Subtask> subtasksToCheck) {
 
         if (subtasksToCheck.isEmpty()) {
             return TaskStatus.NEW;

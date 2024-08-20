@@ -35,11 +35,11 @@ public class Task {
         return description;
     }
 
-    public void setStatus (TaskStatus status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
-    public TaskStatus getStatus () {
+    public TaskStatus getStatus() {
         return status;
     }
 
