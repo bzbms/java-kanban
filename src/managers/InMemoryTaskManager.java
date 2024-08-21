@@ -3,7 +3,6 @@ package managers;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
-import tasks.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,6 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.get(id) == null) {
             return null;
         }
+        historyManager.removeTask(id); // ТЗ-6. Удаление из истории
         return tasks.remove(id);
     }
 
@@ -147,8 +147,10 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         for (Integer subId : epic.getSubtasksIds()) {
+            historyManager.removeTask(subId); // ТЗ-6. Удаление из истории Подзадач Эпика
             subtasks.remove(subId);
         }
+        historyManager.removeTask(id); // ТЗ-6. Удаление из истории самого Эпика
         return epics.remove(id);
     }
 
@@ -163,22 +165,35 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtasksId(id);
         updateEpicStatus(epic);
+        historyManager.removeTask(id); // ТЗ-6. Удаление из истории
         return subtask;
     }
 
     @Override
     public void removeAllTasks() {
+        for (Integer id : tasks.keySet()) { // ТЗ-6. Удаление из истории
+            historyManager.removeTask(id);
+        }
         tasks.clear();
     }
 
     @Override
     public void removeAllEpics() {
+        for (Integer id : epics.keySet()) { // ТЗ-6. Удаление из истории
+            historyManager.removeTask(id);
+        }
+        for (Integer id : subtasks.keySet()) { // ТЗ-6. Удаление из истории
+            historyManager.removeTask(id);
+        }
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void removeAllSubtasks() {
+        for (Integer id : subtasks.keySet()) { // ТЗ-6. Удаление из истории
+            historyManager.removeTask(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.clearSubtaskIds();
@@ -187,38 +202,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
     private void updateEpicStatus(Epic epic) {
         ArrayList<Subtask> subtasksToCheck = getEpicSubtasks(epic.getId());
-
-        if (subtasksToCheck.isEmpty()) {
-            epic.setStatus(TaskStatus.NEW);
-            return;
-        }
-
-        boolean isNEW = false;
-        boolean isDONE = false;
-        for (Subtask subTask : subtasksToCheck) {
-            if (subTask.getStatus() == TaskStatus.IN_PROGRESS) {
-                epic.setStatus(TaskStatus.IN_PROGRESS);
-                return; // Если встретится Подзадача с IN_PROGRESS, то дальнейшие проверки делать не нужно.
-            }
-            if (subTask.getStatus() == TaskStatus.NEW) { // И это значит, что далее может прийти только 2 Статуса.
-                isNEW = true;
-            } else {
-                isDONE = true;
-            }
-        }
-        if (!isNEW) {
-            epic.setStatus(TaskStatus.DONE);
-        } else if (!isDONE) {
-            epic.setStatus(TaskStatus.NEW);
-        } else {
-            epic.setStatus(TaskStatus.IN_PROGRESS);
-        }
+        epic.updateStatus(subtasksToCheck);
     }
 
 }
