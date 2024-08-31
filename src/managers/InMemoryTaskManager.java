@@ -134,7 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.get(id) == null) {
             return null;
         }
-        historyManager.removeTask(id); // ТЗ-6. Удаление из истории
+        historyManager.removeTask(id);
         return tasks.remove(id);
     }
 
@@ -147,10 +147,10 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         for (Integer subId : epic.getSubtasksIds()) {
-            historyManager.removeTask(subId); // ТЗ-6. Удаление из истории Подзадач Эпика
+            historyManager.removeTask(subId);
             subtasks.remove(subId);
         }
-        historyManager.removeTask(id); // ТЗ-6. Удаление из истории самого Эпика
+        historyManager.removeTask(id);
         return epics.remove(id);
     }
 
@@ -165,13 +165,13 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtasksId(id);
         updateEpicStatus(epic);
-        historyManager.removeTask(id); // ТЗ-6. Удаление из истории
+        historyManager.removeTask(id);
         return subtask;
     }
 
     @Override
     public void removeAllTasks() {
-        for (Integer id : tasks.keySet()) { // ТЗ-6. Удаление из истории
+        for (Integer id : tasks.keySet()) {
             historyManager.removeTask(id);
         }
         tasks.clear();
@@ -179,10 +179,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllEpics() {
-        for (Integer id : epics.keySet()) { // ТЗ-6. Удаление из истории
+        for (Integer id : epics.keySet()) {
             historyManager.removeTask(id);
         }
-        for (Integer id : subtasks.keySet()) { // ТЗ-6. Удаление из истории
+        for (Integer id : subtasks.keySet()) {
             historyManager.removeTask(id);
         }
         epics.clear();
@@ -191,7 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllSubtasks() {
-        for (Integer id : subtasks.keySet()) { // ТЗ-6. Удаление из истории
+        for (Integer id : subtasks.keySet()) {
             historyManager.removeTask(id);
         }
         subtasks.clear();
