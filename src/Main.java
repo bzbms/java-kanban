@@ -1,3 +1,5 @@
+import managers.FileBackedTaskManager;
+import managers.ManagerSaveException;
 import managers.Managers;
 import managers.TaskManager;
 import tasks.Epic;
@@ -5,10 +7,16 @@ import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.io.File;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ManagerSaveException {
         TaskManager taskManager = Managers.getDefaultManager();
+
+        File file = new File("src/SavedTasks.csv");
+
+        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
 
         Task task1 = new Task("Zadacha", "Opisanie");
         Task task2 = new Task("Zadacha2", "Opisanie");
@@ -59,6 +67,7 @@ public class Main {
         taskManager.removeEpic(4);
 
         printAllTasks(taskManager);
+
     }
 
     private static void printAllTasks(TaskManager manager) {
