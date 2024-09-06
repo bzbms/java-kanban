@@ -93,6 +93,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public int addTask(Subtask task) {
         super.addTask(task);
         save();
+        if (subtasks.get(task.getId()) == null) {
+            return -1;
+        }
         return task.getId();
     }
 
