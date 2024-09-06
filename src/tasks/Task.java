@@ -9,7 +9,6 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    protected TaskType type = TaskType.TASK;
 
     public Task(String title, String description) {
         this(title, description, TaskStatus.NEW, 0);
@@ -23,7 +22,7 @@ public class Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.TASK;
     }
 
     public void setTitle(String title) {

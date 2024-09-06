@@ -7,7 +7,6 @@ import java.util.List;
 
 public class Epic extends Task {
     protected ArrayList<Integer> subtaskIds = new ArrayList<>();
-    protected TaskType type = TaskType.EPIC;
 
     public Epic(String title, String description) {
         super(title, description);
@@ -18,7 +17,7 @@ public class Epic extends Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.EPIC;
     }
 
     public boolean isEpic() {

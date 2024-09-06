@@ -4,7 +4,6 @@ import managers.TaskType;
 
 public class Subtask extends Task {
     protected int epicId;
-    protected TaskType type = TaskType.SUBTASK;
 
     public Subtask(String title, String description, int epicId) {
         super(title, description);
@@ -17,7 +16,7 @@ public class Subtask extends Task {
     }
 
     public TaskType getType() {
-        return type;
+        return TaskType.SUBTASK;
     }
 
     public int getEpicId() {

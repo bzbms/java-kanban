@@ -9,10 +9,10 @@ import tasks.TaskStatus;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.BufferedReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileBackedTaskManagerTest {
@@ -30,7 +30,11 @@ class FileBackedTaskManagerTest {
     void loadingEmptyFile() throws IOException {
         File file = File.createTempFile("tasks", ".csv");
         FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
-        // Ну какбээээ... Если без выброса ошибки, значит работает...? х)
+
+        assertTrue(taskManager.getAllTasks().isEmpty());
+        assertTrue(taskManager.getAllEpics().isEmpty());
+        assertTrue(taskManager.getAllSubtasks().isEmpty());
+        assertTrue(taskManager.getHistory().isEmpty());
     }
 
     @Test
@@ -55,24 +59,21 @@ class FileBackedTaskManagerTest {
 
     @Test
     void loadingTasks() throws IOException {
+        File file = File.createTempFile("tasks", ".csv");
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
         Task task1 = new Task("Task1", "Description task1", TaskStatus.NEW, 1);
         Epic taskE1 = new Epic("Epic2", "Description epic2", TaskStatus.DONE, 2);
         Subtask taskS1 = new Subtask("Subtask3", "Description subtask3", TaskStatus.DONE, 2, 3);
-        File file = File.createTempFile("tasks", ".csv");
-        String tasks = "id,type,name,status,description,epic\n" +
-                "1,TASK,Task1,NEW,Description task1,\n" +
-                "2,EPIC,Epic2,DONE,Description epic2,\n" +
-                "3,SUBTASK,Subtask3,DONE,Description subtask3,2";
 
-        FileWriter writer = new FileWriter(file);
-        writer.write(tasks);
-        writer.close();
+        taskManager.addTask(task1);
+        taskManager.addTask(taskE1);
+        taskManager.addTask(taskS1);
 
-        FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
+        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
 
-        assertEquals(task1, taskManager.getTask(1));
-        assertEquals(taskE1, taskManager.getTask(2));
-        assertEquals(taskS1, taskManager.getTask(3));
+        assertEquals(taskManager.getTask(1), taskManager2.getTask(1));
+        assertEquals(taskManager.getTask(2), taskManager2.getTask(2));
+        assertEquals(taskManager.getTask(3), taskManager2.getTask(3));
     }
 
 }

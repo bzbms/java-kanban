@@ -3,7 +3,6 @@ package managers;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
-import tasks.TaskStatus;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,23 +22,34 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             String csv = Files.readString(file.toPath());
             String[] csvLines = csv.split("\n");
+            int lastId = 0;
 
             for (int i = 1; i < csvLines.length; i++) { // Пропускаем первую строку с заголовками
-                if (csvLines[i].isBlank()) {
+                if (csvLines[i].isBlank()) { // и пустые, если попадутся...
                     break;
                 }
 
-                Task task = fromString(csvLines[i]);
+                Task task = StringTaskConverter.fromString(csvLines[i]);
 
-                taskManager.addTask(task); // Если строка с Подзадачей будет раньше её Эпика, то она не добавится -
-                // - пока это не отлавливаю, т.к. это видимо не тривиально...
-
+                if (task.getType().equals(TaskType.TASK)) {
+                    taskManager.tasks.put(task.getId(), task);
+                }
+                if (task.getType().equals(TaskType.EPIC)) {
+                    taskManager.epics.put(task.getId(), (Epic) task);
+                }
                 if (task.getType().equals(TaskType.SUBTASK)) {
+                    assert task instanceof Subtask;
                     Subtask subtask = (Subtask) task;
-                    Epic epic = (Epic) taskManager.getTask(subtask.getEpicId());
+                    Epic epic = taskManager.epics.get(subtask.getEpicId());
+
+                    taskManager.subtasks.put(task.getId(), subtask);
                     epic.getSubtasksIds().add(subtask.getId()); // Занесём Подзадачу в список Эпика.
                 }
-            }
+                if (lastId < task.getId()) {
+                    lastId = task.getId();
+                }
+            } // При прямом добавлении в хешмапы тогда нужно и уникальный ID сделать актуальным.
+            taskManager.uniqueId = lastId;
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка выгрузки из файла: " + file.getName(), e);
         }
@@ -51,57 +61,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.write("id,type,name,status,description,epic");
 
             for (Task task : getAllTasks()) {
-                writer.write(toString(task));
+                writer.write(StringTaskConverter.toString(task));
             }
             for (Epic epic : getAllEpics()) {
-                writer.write(toString(epic));
+                writer.write(StringTaskConverter.toString(epic));
             }
             for (Subtask subtask : getAllSubtasks()) {
-                writer.write(toString(subtask));
-            }
-        } catch (ManagerSaveException e) {
-            e.getDetailedMessage();
-            for (StackTraceElement stack : e.getStackTrace()) {
-                System.out.printf("Класс: " + stack.getClassName() + ", " +
-                        "метод: " + stack.getMethodName() + ", " +
-                        "имя файла: " + stack.getFileName() + ", " +
-                        "строка кода: " + stack.getLineNumber() + "%n%n");
+                writer.write(StringTaskConverter.toString(subtask));
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            throw new ManagerSaveException("Ошибка сохранения в файл: " + file.getName(), e);
         }
         // При try-with-resources поток должен сам закрываться.
-    }
-
-    public static Task fromString(String value) {
-        String[] elem = value.split(","); // Разбиваем строку на элементы задачи
-
-        if (TaskType.valueOf(elem[1]) == TaskType.TASK) {
-            return new Task(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
-        }
-        if (TaskType.valueOf(elem[1]) == TaskType.EPIC) {
-            return new Epic(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
-        }
-        if (TaskType.valueOf(elem[1]) == TaskType.SUBTASK) {
-            return new Subtask(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[5]), Integer.parseInt(elem[0]));
-        }
-        return null;
-    }
-
-    public static String toString(Task task) {
-        String epicId = "";
-
-        if (task.getType().equals(TaskType.SUBTASK)) { // Если это Подзадача - узнаем её принадлежность к Эпику.
-            Subtask subtask = (Subtask) task;
-            epicId = Integer.toString(subtask.getEpicId());
-        }
-
-        return "\n" + task.getId() + ","
-                + task.getType() + ","
-                + task.getTitle() + ","
-                + task.getStatus() + ","
-                + task.getDescription() + ","
-                + epicId; // Добавится пустое место или цифра(если Подзадача), запятую не ставим.
     }
 
     @Override
