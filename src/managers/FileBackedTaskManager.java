@@ -38,7 +38,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     taskManager.epics.put(task.getId(), (Epic) task);
                 }
                 if (task.getType().equals(TaskType.SUBTASK)) {
-                    assert task instanceof Subtask;
                     Subtask subtask = (Subtask) task;
                     Epic epic = taskManager.epics.get(subtask.getEpicId());
 
@@ -91,12 +90,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public int addTask(Subtask task) {
-        super.addTask(task);
+        int id = super.addTask(task);
         save();
-        if (subtasks.get(task.getId()) == null) {
-            return -1;
-        }
-        return task.getId();
+        return id;
     }
 
     @Override
