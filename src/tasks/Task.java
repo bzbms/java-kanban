@@ -1,5 +1,7 @@
 package tasks;
 
+import managers.TaskType;
+
 import java.util.Objects;
 
 public class Task {
@@ -17,6 +19,10 @@ public class Task {
         this.description = description;
         this.status = status;
         this.id = id;
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
     }
 
     public void setTitle(String title) {

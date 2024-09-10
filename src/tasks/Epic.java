@@ -1,5 +1,7 @@
 package tasks;
 
+import managers.TaskType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,10 @@ public class Epic extends Task {
 
     public Epic(String title, String description, TaskStatus status, int id) {
         super(title, description, status, id);
+    }
+
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     public boolean isEpic() {
