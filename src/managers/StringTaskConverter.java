@@ -11,21 +11,14 @@ public final class StringTaskConverter {
     }
 
     public static Task fromString(String value) {
-        try {
-            String[] elem = value.split(",");  // Разбиваем строку на элементы задачи
-            if (TaskType.valueOf(elem[1]) == TaskType.TASK) {
-                return new Task(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
-            }
-            if (TaskType.valueOf(elem[1]) == TaskType.EPIC) {
-                return new Epic(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
-            }
-            if (TaskType.valueOf(elem[1]) == TaskType.SUBTASK) {
-                return new Subtask(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[5]), Integer.parseInt(elem[0]));
-            }
-        } catch (IllegalArgumentException | NullPointerException e) {
-            System.out.println("В файле есть недопустимый тип задачи.");
-        }
-        return null;
+        String[] elem = value.split(",");  // Разбиваем строку на элементы задачи
+
+        return switch (TaskType.valueOf(elem[1])) {
+            case TaskType.TASK -> new Task(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
+            case TaskType.EPIC -> new Epic(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[0]));
+            case TaskType.SUBTASK ->
+                    new Subtask(elem[2], elem[4], TaskStatus.valueOf(elem[3]), Integer.parseInt(elem[5]), Integer.parseInt(elem[0]));
+        };
     }
 
     public static String toString(Task task) {

@@ -7,4 +7,5 @@ public class ManagerSaveException extends RuntimeException {
         super(e);
         this.message = message;
     }
+
 }
