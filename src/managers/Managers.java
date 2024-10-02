@@ -8,6 +8,10 @@ public final class Managers {
     }
 
     public static TaskManager getDefaultManager() {
+        return new InMemoryTaskManager();
+    }
+
+    public static TaskManager getDefaultManagerFromFile() {
         return new FileBackedTaskManager(new File("src/SavedTasks.csv"));
     }
 

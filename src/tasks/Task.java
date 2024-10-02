@@ -2,6 +2,9 @@ package tasks;
 
 import managers.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
@@ -9,9 +12,16 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
+    protected LocalDateTime startTime = LocalDateTime.of(0, 1, 1, 0, 0);;
+    protected Duration duration = Duration.ofMinutes(0);;
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
 
     public Task(String title, String description) {
-        this(title, description, TaskStatus.NEW, 0);
+        this(title, description, TaskStatus.NEW, 0, "00:00 01.01.1970", 0);
+    }
+
+    public Task(String title, String description, String startTime, long duration) {
+        this(title, description, TaskStatus.NEW, 0, startTime, duration);
     }
 
     public Task(String title, String description, TaskStatus status, int id) {
@@ -19,6 +29,15 @@ public class Task {
         this.description = description;
         this.status = status;
         this.id = id;
+    }
+
+    public Task(String title, String description, TaskStatus status, int id, String startTime, long duration) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+        this.startTime = LocalDateTime.parse(startTime, formatter);
+        this.duration = Duration.ofMinutes(duration);
     }
 
     public TaskType getType() {
@@ -57,13 +76,28 @@ public class Task {
         return id;
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     @Override
     public String toString() {
         String showTask = "Задача{" +
                 "title=" + title +
                 ", description=" + description +
                 ", status=" + status +
-                ", id=" + id;
+                ", id=" + id +
+                ", startTime=" + startTime.format(formatter) +
+                ", duration=" + duration.toMinutes() +
+                ", endTime=" + getEndTime().format(formatter);
         return showTask + '}';
     }
 
