@@ -20,7 +20,7 @@ public class Main {
 
         Task task1 = new Task("Zadacha", "Opisanie", "10:00 27.09.2024", 59);
         Task task2 = new Task("Zadacha2", "Opisanie", "11:00 27.09.2024", 0);
-        Task task3 = new Task("Zadacha3", "Opisanie", "11:00 27.09.2024", 0);
+        Task task3 = new Task("Zadacha3", "Opisanie", "11:01 27.09.2024", 0);
 
         Epic taskE1 = new Epic("1EPICZadacha", "Opisanie", "10:00 28.09.2024", 59);
         Epic taskE2 = new Epic("2EPICZadacha", "Opisanie", "12:00 27.09.2024", 59);
@@ -58,26 +58,12 @@ public class Main {
         fileBackedTaskManager.getEpic(4);
         fileBackedTaskManager.getSubtask(7);
 
-       // printAllTasks(fileBackedTaskManager);
-        System.out.println(fileBackedTaskManager.getEpic(4));
-        System.out.println(fileBackedTaskManager.getEpicSubtasks(4));
-        System.out.println(fileBackedTaskManager.getEpic(4).updateTime(fileBackedTaskManager.getEpicSubtasks(4)));
-
-        System.out.println();
-        System.out.println();
-        fileBackedTaskManager.removeAllTasks();
-        System.out.println(fileBackedTaskManager.getPrioritizedTasks());
-
-/*
-
         printAllTasks(fileBackedTaskManager);
         System.out.println();
         System.out.println();
-        for (Task prioritizedTask : taskManager.getPrioritizedTasks()) {
+        for (Task prioritizedTask : fileBackedTaskManager.getPrioritizedTasks()) {
             System.out.println(prioritizedTask);
         }
-*/
-
 
     }
 

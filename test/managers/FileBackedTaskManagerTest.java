@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     File file;
 
     @BeforeEach
@@ -27,7 +27,7 @@ class FileBackedTaskManagerTest {
     @Test
     void savingEmptyFile() {
         TaskManager taskManager = new FileBackedTaskManager(file);
-        Task task1 = new Task("Zadacha", "Opisanie");
+        Task task1 = new Task("Zadacha", "Opisanie", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
 
         assertNotNull(taskManager.getTask(taskManager.addTask(task1)));
     }
@@ -45,9 +45,9 @@ class FileBackedTaskManagerTest {
     @Test
     void loadingTasks() {
         TaskManager taskManager = new FileBackedTaskManager(file);
-        Task task1 = new Task("Task1", "Description task1", TaskStatus.NEW, 1);
-        Epic taskE1 = new Epic("Epic2", "Description epic2", TaskStatus.DONE, 2);
-        Subtask taskS1 = new Subtask("Subtask3", "Description subtask3", TaskStatus.DONE, 2, 3);
+        Task task1 = new Task("Task1", "Description task1", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
+        Epic taskE1 = new Epic("Epic2", "Description epic2", TaskStatus.DONE, 2, "12:00 01.10.2024", 25);
+        Subtask taskS1 = new Subtask("Subtask3", "Description subtask3", TaskStatus.DONE, 2, 3, "13:00 01.10.2024", 35);
 
         taskManager.addTask(task1);
         taskManager.addTask(taskE1);
@@ -100,7 +100,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void timeIntersection() {
+    public void timeMustIntersect() {
         TaskManager taskManager = new FileBackedTaskManager(file);
         Task task = new Task("TTask", "DescriptionT", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
         Epic epic = new Epic("Etask", "DescriptionE", TaskStatus.NEW, 2, "12:00 01.10.2024", 25);
@@ -117,6 +117,18 @@ class FileBackedTaskManagerTest {
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(task2));
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(task3));
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(subtask2));
+    }
+
+    @Test
+    public void timeMustNotIntersect() {
+        TaskManager taskManager = new FileBackedTaskManager(file);
+        Task task = new Task("TTask", "DescriptionT", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
+        Epic epic = new Epic("Etask", "DescriptionE", TaskStatus.NEW, 2, "12:00 01.10.2024", 25);
+        Subtask subtask = new Subtask("Stask", "DescriptionS", TaskStatus.NEW, 2, 3, "13:00 01.10.2024", 35);
+
+        taskManager.addTask(task);
+        taskManager.addTask(epic);
+        taskManager.addTask(subtask);
 
         Task task4 = new Task("TTask", "DescriptionT", TaskStatus.NEW, 7, "21:10 01.10.2024", 30);
         Subtask subtask3 = new Subtask("Stask", "DescriptionS", TaskStatus.NEW, 2, 8, "00:00 01.10.2024", 35);
@@ -124,5 +136,4 @@ class FileBackedTaskManagerTest {
         assertDoesNotThrow(() -> taskManager.addTask(task4));
         assertDoesNotThrow(() -> taskManager.addTask(subtask3));
     }
-
 }

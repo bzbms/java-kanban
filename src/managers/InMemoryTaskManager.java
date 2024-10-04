@@ -1,15 +1,5 @@
 package managers;
 
-/*
-https://yandex.zoom.us/rec/play/z9N1dYzpo8vyexI3d69RS3N0rJxj7xo__b64MDdvlL0hy-F-rLGNyLUrdd4PwBY_7HT9F9N9WUPRxzOU.Qq9SVi53nyi6BE9U?canPlayFromShare=true&from=share_recording_detail&continueMode=true&componentName=rec-play&originRequestUrl=https%3A%2F%2Fyandex.zoom.us%2Frec%2Fshare%2FVIkXGMO1wQEGYHXZWlAaDpgbRM_gsVSI4m-vh20H0E0Q8eD1Col0M8qsXGCG02am.RZMk25c6HhgQUqbW
-
-- тесты - чтобы был unit5 и правильный имопрт (org.junit.jupiter)
-- в абстрактном классе-тесте тесты не будут ранится!!! (его не надо пробовать запускать)
-- у вас был элемент в TreeSet вы его изменили - внимание - он теперь вне сортировки этого множества. Элемент надо сначала удалить из множества, потом изменить и снова добавить - так он отсортируется и добавится как надо
-
- */
-
-
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -21,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Comparator;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int uniqueId = 0;
@@ -30,29 +19,26 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     // Компаратор через stream перебирает задачи в коллекции (TreeSet) и вызывает у них метод начального времени,
-    // сортируя первыми ставя Null'ы, а остальное ставя по убыванию.
-    // Если время старта совпадёт, то первыми поставит по id задачи.
+    // сортируя по убыванию. Если время старта совпадёт, то первыми поставит по id задачи.
     private final Comparator<Task> taskComparator =
-            Comparator.comparing(Task::getStartTime, Comparator.nullsFirst(Comparator.naturalOrder())).thenComparing(Task::getId);
+            Comparator.comparing(Task::getStartTime, Comparator.naturalOrder()).thenComparing(Task::getId);
     private final TreeSet<Task> prioritizedTasks = new TreeSet<>(taskComparator);
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
 
     public List<Task> getPrioritizedTasks() {
-        // Отсеиваем null'ы сразу здесь.
-        return prioritizedTasks.stream().filter(task -> task.getStartTime() != null).collect(Collectors.toList());
+        return new ArrayList<>(prioritizedTasks);
     }
 
     // ДОБАВЛЕНИЕ
     @Override
     public int addTask(Task task) {
-        if (isTimeNotIntersects(task)) {
-            final int id = ++uniqueId;
-            task.setId(id);
+        final int id = ++uniqueId;
+        task.setId(id);
+        if (task.getStartTime() != null && isTimeNotIntersects(task)) {
             prioritizedTasks.add(task);
-            tasks.put(id, task);
-            return id;
         }
-        return -1;
+        tasks.put(id, task);
+        return id;
     }
 
     @Override
@@ -70,17 +56,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) { // 2. Если таких Эпиков не создано, то метод будет завершаться на этом во избежание ошибки.
             return -1; // А Подзадача не будет добавлена.
         }
-        if (isTimeNotIntersects(task)) {
-            final int id = ++uniqueId; // 3. Только после этого можно дальше продолжать обычное добавление.
-            task.setId(id);
-            epic.addSubtasksId(id); // 4. В Список полученного Эпика добавляется ID Подзадачи.
-            subtasks.put(task.getId(), task);
+        final int id = ++uniqueId; // 3. Только после этого можно дальше продолжать обычное добавление.
+        task.setId(id);
+        epic.addSubtasksId(id); // 4. В Список полученного Эпика добавляется ID Подзадачи.
+        if (task.getStartTime() != null && isTimeNotIntersects(task)) {
             prioritizedTasks.add(task);
-            updateEpicStatus(epic);
-            updateEpicTime(epic);
-            return task.getId();
         }
-        return -2;
+        subtasks.put(task.getId(), task);
+        updateEpicStatus(epic);
+        updateEpicTime(epic);
+        return task.getId();
     }
 
     // ОБНОВЛЕНИЕ
@@ -89,15 +74,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(task.getId())) {
             return -1;
         }
-        Task oldTask = tasks.get(task.getId());
-        prioritizedTasks.remove(oldTask); // Для обновления сортировки необходимо пере-добавить задачу в Set.
-        if (isTimeNotIntersects(task)) {
-            prioritizedTasks.add(task);
-            tasks.put(task.getId(), task);
-            return task.getId();
+        if (task.getStartTime() == null) {
+            prioritizedTasks.remove(task); // Если у задачи убрали время, значит она более не приоритетная...
+        } else {
+            prioritizedTasks.remove(tasks.get(task.getId())); // Чтобы сравнивать обновлённую со всеми, нужно убрать её старый экземпляр.
+            if (isTimeNotIntersects(task)) {
+                prioritizedTasks.add(task); // Если обновлённая задача не пройдёт проверку - то и зачем ей задали время...
+            }
         }
-        prioritizedTasks.add(oldTask); // Если обновлённая задача не пройдёт проверку - возвращаем старую на место.
-        return -2;
+        tasks.put(task.getId(), task);
+        return task.getId();
     }
 
     @Override
@@ -114,18 +100,19 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtasks.containsKey(task.getId())) {
             return -1;
         }
-        Subtask oldSubtask = subtasks.get(task.getId());
-        prioritizedTasks.remove(oldSubtask);
-        if (isTimeNotIntersects(task)) {
-            prioritizedTasks.add(task);
-            subtasks.put(task.getId(), task);
-            Epic epic = epics.get(task.getEpicId());
-            updateEpicStatus(epic);
-            updateEpicTime(epic);
-            return task.getId();
+        if (task.getStartTime() == null) {
+            prioritizedTasks.remove(task);
+        } else {
+            prioritizedTasks.remove(subtasks.get(task.getId()));
+            if (isTimeNotIntersects(task)) {
+                prioritizedTasks.add(task);
+            }
         }
-        prioritizedTasks.add(oldSubtask);
-        return -2;
+        subtasks.put(task.getId(), task);
+        Epic epic = epics.get(task.getEpicId());
+        updateEpicStatus(epic);
+        updateEpicTime(epic);
+        return task.getId();
     }
 
     // ПОЛУЧЕНИЕ
@@ -254,14 +241,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clear() {
-        prioritizedTasks.clear();
-        tasks.clear();
-        subtasks.clear();
-        epics.clear();
-    }
-
-    @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
@@ -277,31 +256,30 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean isTimeNotIntersects(Task task) {
-        List<Task> tasks = getPrioritizedTasks();
+        List<Task> prioritizedTasks = getPrioritizedTasks();
 
-        if (tasks.size() > 1) {
+/* Мой разум всё равно глючит с логическими преобразованиями... x)
+as    ae   bs     be
+|------|   |------|
+as     bs   ae    be
+|------|====|-----|
+
+a.start > b.end OR a.end < b.start - непересечение
+NOT( a.start > b.end OR a.end < b.start ) - пересечение
+a.start <= b.end AND a.end >= b.start - упрощение
+*/
+        for (Task addedTask : prioritizedTasks) {
             LocalDateTime newStart = task.getStartTime();
             LocalDateTime newEnd = task.getEndTime();
-            // Можем не проверять весь список, если новая задача будет раньше первой или позже последней.
-/*            if (newEnd.isAfter(tasks.getFirst().getStartTime()) || newStart.isBefore(tasks.getLast().getEndTime())) {
-                return true;
-            } else { */// Если же задача пытается вклиниться между текущими, то придётся проверять весь список.
-            // Видимо интересная идея оптимизировать проверку, но я так и не смог её реализовать...
-
-            for (int i = 0; i < tasks.size(); i++) { // Тогда бы я начинал проверку c i = 1 до предпоследнего...
-                LocalDateTime ongoingStart = tasks.get(i).getStartTime();
-                LocalDateTime ongoingEnd = tasks.get(i).getEndTime();
-                if (!newEnd.isAfter(ongoingStart) || !newStart.isBefore(ongoingEnd)) {
-                    continue; // Я здесь сломал голову, так и не смог понять как отбирают эти условия - оставил то, что выдаёт верный результат после метода перебора... =(
-                }
+            LocalDateTime ongoingStart = addedTask.getStartTime();
+            LocalDateTime ongoingEnd = addedTask.getEndTime();
+            if ((newEnd.isAfter(ongoingStart) || newEnd.equals(ongoingStart)) && (newStart.isBefore(ongoingEnd) || newStart.equals(ongoingEnd))) {
                 System.out.println("Время выполнения задач пересекается:\n"
                         + newStart.format(formatter) + " - " + newEnd.format(formatter) + " - " + task.getTitle() + ", id=" + task.getId() + "\n"
-                        + ongoingStart.format(formatter) + " - " + ongoingEnd.format(formatter) + " - " + tasks.get(i).getTitle() + ", id=" + tasks.get(i).getId());
+                        + ongoingStart.format(formatter) + " - " + ongoingEnd.format(formatter) + " - " + addedTask.getTitle() + ", id=" + addedTask.getId());
                 throw new ManagerSaveException();
             }
         }
-        // }
         return true;
     }
-
 }

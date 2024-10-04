@@ -12,12 +12,12 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    protected LocalDateTime startTime = LocalDateTime.of(0, 1, 1, 0, 0);;
-    protected Duration duration = Duration.ofMinutes(0);;
+    protected LocalDateTime startTime;
+    protected Duration duration;
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
 
     public Task(String title, String description) {
-        this(title, description, TaskStatus.NEW, 0, "00:00 01.01.1970", 0);
+        this(title, description, TaskStatus.NEW, 0, null, 0);
     }
 
     public Task(String title, String description, String startTime, long duration) {
@@ -74,6 +74,14 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
     }
 
     public LocalDateTime getStartTime() {

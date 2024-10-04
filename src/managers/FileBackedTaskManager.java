@@ -159,12 +159,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
-    public void clear() {
-        super.clear();
-        save();
-    }
-
 }
 
 

@@ -8,6 +8,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public abstract void epicStatusCalculating();
 
     @Test
-    public abstract void timeIntersection();
+    public abstract void timeMustIntersect();
+
+    @Test
+    public abstract void timeMustNotIntersect();
 
 }

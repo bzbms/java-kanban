@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     static TaskManager taskManager;
     static Task task;
     static Epic epic;
@@ -63,7 +63,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
     }
 
     @Test
-    public void timeIntersection() {
+    public void timeMustIntersect() {
         Task task2 = new Task("TTask", "DescriptionT", TaskStatus.NEW, 4, "11:10 01.10.2024", 30);
         Task task3 = new Task("TTask", "DescriptionT", TaskStatus.NEW, 5, "10:50 01.10.2024", 30);
         Subtask subtask2 = new Subtask("Stask", "DescriptionS", TaskStatus.NEW, 2, 6, "13:00 01.10.2024", 35);
@@ -71,7 +71,10 @@ class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(task2));
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(task3));
         assertThrows(ManagerSaveException.class, () -> taskManager.addTask(subtask2));
+    }
 
+    @Test
+    public void timeMustNotIntersect() {
         Task task4 = new Task("TTask", "DescriptionT", TaskStatus.NEW, 7, "21:10 01.10.2024", 30);
         Subtask subtask3 = new Subtask("Stask", "DescriptionS", TaskStatus.NEW, 2, 8, "00:00 01.10.2024", 35);
 
@@ -103,9 +106,9 @@ class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
 
     @Test
     void updatingShouldReturnNewTask() {
-        final Task task2 = new Task("TTask2", "Description", TaskStatus.DONE, 1);
-        final Epic epic2 = new Epic("Etask2", "Description2", TaskStatus.DONE, 2);
-        final Subtask subtask2 = new Subtask("Stask2", "Description", TaskStatus.DONE, 2, 3);
+        final Task task2 = new Task("TTask2", "Description", TaskStatus.DONE, 1, "11:00 01.10.2024", 30);
+        final Epic epic2 = new Epic("Etask2", "Description2", TaskStatus.DONE, 2, "12:00 01.10.2024", 25);
+        final Subtask subtask2 = new Subtask("Stask2", "Description", TaskStatus.DONE, 2, 3, "13:00 01.10.2024", 35);
         final String taskTitle = task2.getTitle();
         final String epicDescription = epic2.getDescription();
         final TaskStatus subtaskStatus = subtask2.getStatus();
@@ -147,9 +150,9 @@ class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
 
     @Test
     void addingTasksWithIdWithoutConflicts() {
-        final Task taskWithId = new Task("TTask", "Description", TaskStatus.NEW, 1);
-        final Epic epicWithId = new Epic("Etask", "Description", TaskStatus.NEW, 2);
-        final Subtask subtaskWithId = new Subtask("Stask", "Description", TaskStatus.NEW, 2, 3);
+        final Task taskWithId = new Task("TTask", "Description", TaskStatus.NEW, 1, "11:31 01.10.2024", 30);
+        final Epic epicWithId = new Epic("Etask", "Description", TaskStatus.NEW, 2, "12:26 01.10.2024", 25);
+        final Subtask subtaskWithId = new Subtask("Stask", "Description", TaskStatus.NEW, 2, 3, "14:00 01.10.2024", 35);
 
         taskManager.addTask(taskWithId);
         taskManager.addTask(epicWithId);
