@@ -14,11 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class HistoryManagerTest {
-
     @Test
     void addingToHistory() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe");
+        Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
 
         historyManager.addTask(task);
         assertNotNull(historyManager.getHistory().get(0), "Задача не добавилась.");
@@ -27,7 +26,7 @@ class HistoryManagerTest {
     @Test
     void removingFromHistory() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe");
+        Task task = new Task("TaskovProdoyote?", "NetTolьkoTestiruem...Ozadachennoe", "11:00 01.10.2024", 30);
 
         historyManager.addTask(task);
         historyManager.removeTask(0);
@@ -37,10 +36,10 @@ class HistoryManagerTest {
     @Test
     void linkedListWorksRight() {
         TaskManager taskManager = Managers.getDefaultManager();
-        Task task1 = new Task("T1", "");
-        Epic taskE1 = new Epic("E1", "");
-        Epic taskE2 = new Epic("E2", "");
-        Subtask taskS1 = new Subtask("S1", "", 2);
+        Task task1 = new Task("T1", "", "11:00 01.10.2024", 30);
+        Epic taskE1 = new Epic("E1", "", "12:00 01.10.2024", 25);
+        Epic taskE2 = new Epic("E2", "", "13:00 01.10.2024", 25);
+        Subtask taskS1 = new Subtask("S1", "", "14:00 01.10.2024", 25, 2);
         taskManager.addTask(task1);
         taskManager.addTask(taskE1);
         taskManager.addTask(taskE2);
@@ -75,9 +74,9 @@ class HistoryManagerTest {
     @Test
     void removeTaskFromMiddle() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task task1 = new Task("T1", "", TaskStatus.NEW, 1);
-        Task task2 = new Task("T2", "", TaskStatus.NEW, 2);
-        Task task3 = new Task("T3", "", TaskStatus.NEW, 3);
+        Task task1 = new Task("T1", "", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
+        Task task2 = new Task("T2", "", TaskStatus.NEW, 2, "12:00 01.10.2024", 25);
+        Task task3 = new Task("T3", "", TaskStatus.NEW, 3, "13:00 01.10.2024", 35);
 
         historyManager.addTask(task1);
         historyManager.addTask(task2);
@@ -90,9 +89,9 @@ class HistoryManagerTest {
     @Test
     void removeTaskFromEnd() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        Task task1 = new Task("T1", "", TaskStatus.NEW, 1);
-        Task task2 = new Task("T2", "", TaskStatus.NEW, 2);
-        Task task3 = new Task("T3", "", TaskStatus.NEW, 3);
+        Task task1 = new Task("T1", "", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
+        Task task2 = new Task("T2", "", TaskStatus.NEW, 2, "12:00 01.10.2024", 25);
+        Task task3 = new Task("T3", "", TaskStatus.NEW, 3, "13:00 01.10.2024", 35);
 
         historyManager.addTask(task1);
         historyManager.addTask(task2);
