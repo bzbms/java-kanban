@@ -66,44 +66,12 @@ public class Epic extends Task {
                 if (startTime == null || startTime.isAfter(subtask.getStartTime())) {
                     startTime = subtask.getStartTime();
                 }
-                duration = duration.plus(subtask.getDuration());
                 if (endTime == null || endTime.isBefore(subtask.getEndTime())) {
                     endTime = subtask.getEndTime();
                 }
+                duration = Duration.between(startTime, endTime);
             });
-            /*  Так сделал сперва, но выглядит громоздко... Да и эти проверки наверное не шибко оптимизируют процесс...
-        if (!subtasks.isEmpty()) {
-            startTime = subtasks.getFirst().getStartTime();
-            duration = subtasks.getFirst().getDuration();
-            endTime = subtasks.getFirst().getEndTime();
-            if (subtasks.size() > 1) {
-                LocalDateTime subtaskStartTime;
-                Duration subtaskDuration;
-                LocalDateTime subtaskEndTime;
-                for (int i = 1; i < subtasks.size(); i++) {
-                    subtaskStartTime = subtasks.get(i).getStartTime();
-                    if (startTime == null || startTime.isAfter(subtaskStartTime)) {
-                        startTime = subtaskStartTime;
-                    }
-                    subtaskDuration = subtasks.get(i).getDuration();
-                    duration = duration.plus(subtaskDuration);
-                    subtaskEndTime = subtasks.get(i).getEndTime();
-                    if (endTime == null || endTime.isBefore(subtaskEndTime)) {
-                        endTime = subtaskEndTime;
-                    }
-                }
-            }*/
         }
-/* Пригодилось для проверки, но в конечном результате не нужно что-то возвращать.
-       if (endTime == null) {
-            return startTime.format(formatter) + " - "
-                    + duration.toMinutes() + "мин, "
-                    + endTime;
-        } else {
-            return startTime.format(formatter) + " - "
-                    + duration.toMinutes() + "мин, "
-                    + endTime.format(formatter);
-        }*/
     }
 
     private TaskStatus defineStatus(List<Subtask> subtasksToCheck) {

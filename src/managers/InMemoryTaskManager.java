@@ -266,14 +266,14 @@ as     bs   ae    be
 
 a.start > b.end OR a.end < b.start - непересечение
 NOT( a.start > b.end OR a.end < b.start ) - пересечение
-a.start <= b.end AND a.end >= b.start - упрощение
+a.start <= b.end AND a.end >= b.start - преобразование
 */
         for (Task addedTask : prioritizedTasks) {
             LocalDateTime newStart = task.getStartTime();
             LocalDateTime newEnd = task.getEndTime();
             LocalDateTime ongoingStart = addedTask.getStartTime();
             LocalDateTime ongoingEnd = addedTask.getEndTime();
-            if ((newEnd.isAfter(ongoingStart) || newEnd.equals(ongoingStart)) && (newStart.isBefore(ongoingEnd) || newStart.equals(ongoingEnd))) {
+            if (!(newEnd.isBefore(ongoingStart) || newStart.isAfter(ongoingEnd))) {
                 System.out.println("Время выполнения задач пересекается:\n"
                         + newStart.format(formatter) + " - " + newEnd.format(formatter) + " - " + task.getTitle() + ", id=" + task.getId() + "\n"
                         + ongoingStart.format(formatter) + " - " + ongoingEnd.format(formatter) + " - " + addedTask.getTitle() + ", id=" + addedTask.getId());
