@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -43,6 +44,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                     taskManager.subtasks.put(task.getId(), subtask);
                     epic.getSubtasksIds().add(subtask.getId()); // Занесём Подзадачу в список Эпика.
+                    List<Subtask> subtasks = taskManager.getEpicSubtasks(subtask.getEpicId());
+                    epic.updateStatus(subtasks);
+                    epic.updateTime(subtasks);
                 }
                 if (lastId < task.getId()) {
                     lastId = task.getId();
@@ -57,7 +61,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,name,status,description,epic");
+            writer.write("id,type,name,status,description,startTime,duration(min),epicId");
 
             for (Task task : getAllTasks()) {
                 writer.write(StringTaskConverter.toString(task));

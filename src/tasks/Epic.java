@@ -2,18 +2,29 @@ package tasks;
 
 import managers.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     protected ArrayList<Integer> subtaskIds = new ArrayList<>();
+    protected LocalDateTime endTime;
 
     public Epic(String title, String description) {
         super(title, description);
     }
 
+    public Epic(String title, String description, String startTime, long duration) {
+        super(title, description, TaskStatus.NEW, 0, startTime, duration);
+    }
+
     public Epic(String title, String description, TaskStatus status, int id) {
         super(title, description, status, id);
+    }
+
+    public Epic(String title, String description, TaskStatus status, int id, String startTime, long duration) {
+        super(title, description, status, id, startTime, duration);
     }
 
     public TaskType getType() {
@@ -48,6 +59,21 @@ public class Epic extends Task {
         this.status = defineStatus(subtasksToCheck);
     }
 
+    public void updateTime(List<Subtask> subtasks) {
+        if (!subtasks.isEmpty()) {
+            duration = Duration.ofMinutes(0);
+            subtasks.forEach(subtask -> {
+                if (startTime == null || startTime.isAfter(subtask.getStartTime())) {
+                    startTime = subtask.getStartTime();
+                }
+                if (endTime == null || endTime.isBefore(subtask.getEndTime())) {
+                    endTime = subtask.getEndTime();
+                }
+                duration = Duration.between(startTime, endTime);
+            });
+        }
+    }
+
     private TaskStatus defineStatus(List<Subtask> subtasksToCheck) {
 
         if (subtasksToCheck.isEmpty()) {
@@ -74,4 +100,26 @@ public class Epic extends Task {
             return TaskStatus.IN_PROGRESS;
         }
     }
+
+    @Override
+    public String toString() {
+        String start = "Не задано";
+        String end = "Не задано";
+        if (startTime != null) {
+            start = startTime.format(formatter);
+        }
+        if (endTime != null) {
+            end = endTime.format(formatter);
+        }
+        String showTask = "Задача{" +
+                "title=" + title +
+                ", description=" + description +
+                ", status=" + status +
+                ", id=" + id +
+                ", startTime=" + start +
+                ", duration=" + duration.toMinutes() +
+                ", endTime=" + end;
+        return showTask + '}';
+    }
+
 }

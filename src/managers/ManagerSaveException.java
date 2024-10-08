@@ -8,4 +8,6 @@ public class ManagerSaveException extends RuntimeException {
         this.message = message;
     }
 
+    public ManagerSaveException() {
+    }
 }

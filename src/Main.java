@@ -18,55 +18,52 @@ public class Main {
 
         FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
 
-        Task task1 = new Task("Zadacha", "Opisanie");
-        Task task2 = new Task("Zadacha2", "Opisanie");
-        Task task3 = new Task("Zadacha3", "Opisanie");
+        Task task1 = new Task("Zadacha", "Opisanie", "10:00 27.09.2024", 59);
+        Task task2 = new Task("Zadacha2", "Opisanie", "11:00 27.09.2024", 0);
+        Task task3 = new Task("Zadacha3", "Opisanie", "11:01 27.09.2024", 0);
 
-        Epic taskE1 = new Epic("1EPICZadacha", "Opisanie");
-        Epic taskE2 = new Epic("2EPICZadacha", "Opisanie");
-        Epic taskE3 = new Epic("3EPICZadacha", "Opisanie");
+        Epic taskE1 = new Epic("1EPICZadacha", "Opisanie", "10:00 28.09.2024", 59);
+        Epic taskE2 = new Epic("2EPICZadacha", "Opisanie", "12:00 27.09.2024", 59);
+        Epic taskE3 = new Epic("3EPICZadacha", "Opisanie", "11:00 28.09.2024", 59);
 
-        Subtask st41 = new Subtask("4SubZadacha", "Opisanie", 4);
-        Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", 4);
-        Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", 5);
+        Subtask st41 = new Subtask("4SubZadacha", "Opisanie", "10:00 29.09.2024", 59, 4);
+        Subtask st42 = new Subtask("4Sub2Zadacha", "Opisanie", "12:00 29.09.2024", 59, 4);
+        Subtask st51 = new Subtask("5Sub3Zadacha", "Opisanie", "12:00 28.09.2024", 59, 5);
 
-        System.out.println(taskManager.addTask(task1));
-        System.out.println(taskManager.addTask(task2));
-        System.out.println(taskManager.addTask(task3));
+        System.out.println(fileBackedTaskManager.addTask(task1));
+        System.out.println(fileBackedTaskManager.addTask(task2));
+        System.out.println(fileBackedTaskManager.addTask(task3));
 
-        System.out.println(taskManager.addTask(taskE1));
-        System.out.println(taskManager.addTask(taskE2));
-        System.out.println(taskManager.addTask(taskE3));
+        System.out.println(fileBackedTaskManager.addTask(taskE1));
+        System.out.println(fileBackedTaskManager.addTask(taskE2));
+        System.out.println(fileBackedTaskManager.addTask(taskE3));
 
-        System.out.println(taskManager.addTask(st41));
-        System.out.println(taskManager.addTask(st42));
-        System.out.println(taskManager.addTask(st51));
+        System.out.println(fileBackedTaskManager.addTask(st41));
+        System.out.println(fileBackedTaskManager.addTask(st42));
+        System.out.println(fileBackedTaskManager.addTask(st51));
 
-        st42 = new Subtask("4Sub2Zadacha", "Opisanie", TaskStatus.DONE, 4, 8);
-        taskManager.updateTask(st42);
+        st42 = new Subtask("4Sub2Zadacha", "Opisanie", TaskStatus.DONE, 4, 8, "12:00 29.09.2024", 59);
+        fileBackedTaskManager.updateTask(st42);
 
-        taskManager.getTask(2);
-        taskManager.getEpic(4);
-        taskManager.getSubtask(7);
-        taskManager.getTask(1);
-        taskManager.getEpic(5);
-        taskManager.getSubtask(8);
-        taskManager.getTask(3);
-        taskManager.getEpic(6);
-        taskManager.getSubtask(9);
-        taskManager.getTask(2);
-        taskManager.getEpic(4);
-        taskManager.getSubtask(7);
+        fileBackedTaskManager.getTask(2);
+        fileBackedTaskManager.getEpic(3);
+        fileBackedTaskManager.getSubtask(5);
+        fileBackedTaskManager.getTask(1);
+        fileBackedTaskManager.getEpic(4);
+        fileBackedTaskManager.getSubtask(8);
+        fileBackedTaskManager.getTask(3);
+        fileBackedTaskManager.getEpic(6);
+        fileBackedTaskManager.getSubtask(9);
+        fileBackedTaskManager.getTask(2);
+        fileBackedTaskManager.getEpic(4);
+        fileBackedTaskManager.getSubtask(7);
 
-        printAllTasks(taskManager);
-
-        taskManager.removeTask(1);
-
-        printAllTasks(taskManager);
-
-        taskManager.removeEpic(4);
-
-        printAllTasks(taskManager);
+        printAllTasks(fileBackedTaskManager);
+        System.out.println();
+        System.out.println();
+        for (Task prioritizedTask : fileBackedTaskManager.getPrioritizedTasks()) {
+            System.out.println(prioritizedTask);
+        }
 
     }
 

@@ -48,4 +48,6 @@ public interface TaskManager {
     void removeAllSubtasks();
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

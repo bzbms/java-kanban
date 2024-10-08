@@ -11,45 +11,47 @@ import java.io.IOException;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     File file;
 
     @BeforeEach
     void beforeEach() throws IOException {
         file = File.createTempFile("tasks", ".csv");
+        taskManager = new FileBackedTaskManager(file);
+        initTasks();
     }
 
     @Test
     void savingEmptyFile() {
-        TaskManager taskManager = new FileBackedTaskManager(file);
-        Task task1 = new Task("Zadacha", "Opisanie");
+        TaskManager taskManager3 = new FileBackedTaskManager(file);
+        Task task1 = new Task("Zadacha", "Opisanie", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
 
-        assertNotNull(taskManager.getTask(taskManager.addTask(task1)));
+        assertNotNull(taskManager3.getTask(taskManager3.addTask(task1)));
     }
 
     @Test
-    void loadingEmptyFile() {
-        TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
-
-        assertTrue(taskManager.getAllTasks().isEmpty());
-        assertTrue(taskManager.getAllEpics().isEmpty());
-        assertTrue(taskManager.getAllSubtasks().isEmpty());
-        assertTrue(taskManager.getHistory().isEmpty());
+    void loadingEmptyFile() throws IOException {
+        file = File.createTempFile("tasks", ".csv");
+        TaskManager taskManager4 = FileBackedTaskManager.loadFromFile(file);
+        assertTrue(taskManager4.getAllTasks().isEmpty());
+        assertTrue(taskManager4.getAllEpics().isEmpty());
+        assertTrue(taskManager4.getAllSubtasks().isEmpty());
+        assertTrue(taskManager4.getHistory().isEmpty());
     }
 
     @Test
     void loadingTasks() {
-        TaskManager taskManager = new FileBackedTaskManager(file);
-        Task task1 = new Task("Task1", "Description task1", TaskStatus.NEW, 1);
-        Epic taskE1 = new Epic("Epic2", "Description epic2", TaskStatus.DONE, 2);
-        Subtask taskS1 = new Subtask("Subtask3", "Description subtask3", TaskStatus.DONE, 2, 3);
+        TaskManager taskManager1 = new FileBackedTaskManager(file);
+        Task task1 = new Task("Task1", "Description task1", TaskStatus.NEW, 1, "11:00 01.10.2024", 30);
+        Epic taskE1 = new Epic("Epic2", "Description epic2", TaskStatus.DONE, 2, "12:00 01.10.2024", 25);
+        Subtask taskS1 = new Subtask("Subtask3", "Description subtask3", TaskStatus.DONE, 2, 3, "13:00 01.10.2024", 35);
 
-        taskManager.addTask(task1);
-        taskManager.addTask(taskE1);
-        taskManager.addTask(taskS1);
+        taskManager1.addTask(task1);
+        taskManager1.addTask(taskE1);
+        taskManager1.addTask(taskS1);
 
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
 
