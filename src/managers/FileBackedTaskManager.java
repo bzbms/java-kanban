@@ -44,9 +44,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                     taskManager.subtasks.put(task.getId(), subtask);
                     epic.getSubtasksIds().add(subtask.getId()); // Занесём Подзадачу в список Эпика.
+
+                    /* В целом этот костыль поправляет неверно введённые данные в текстовый файлик,
+                    но там же может быть много таких нарушений и охотиться за каждым из них пока нецелесообразно...
                     List<Subtask> subtasks = taskManager.getEpicSubtasks(subtask.getEpicId());
                     epic.updateStatus(subtasks);
                     epic.updateTime(subtasks);
+                    */
                 }
                 if (lastId < task.getId()) {
                     lastId = task.getId();
