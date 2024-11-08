@@ -1,15 +1,16 @@
 package managers;
 
 import org.junit.jupiter.api.Test;
+import servers.NotFoundException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -119,30 +120,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void removingShouldReturnSameTasksAndNull() {
+    void removingShouldReturnSameTasksAndThrow() {
         assertEquals(task, taskManager.removeTask(1), "Задача не та же.");
-        assertNull(taskManager.getTask(1), "Задача не удалилась.");
+        assertThrows(NotFoundException.class, () -> taskManager.getTask(1), "Задача не удалилась.");
         assertEquals(subtask, taskManager.removeSubtask(3), "Подзадача не та же.");
-        assertNull(taskManager.getSubtask(3), "Подзадача не удалилась.");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubtask(3), "Подзадача не удалилась.");
         assertEquals(epic, taskManager.removeEpic(2), "Эпик не тот же.");
-        assertNull(taskManager.getEpic(2), "Эпик не удалился.");
+        assertThrows(NotFoundException.class, () -> taskManager.getEpic(2), "Эпик не удалился.");
     }
 
     @Test
-    void removingAllShouldBeNull() {
+    void removingAllShouldBeEmpty() {
         taskManager.removeAllTasks();
-        assertNull(taskManager.getTask(1), "Задача не удалилась.");
+        assertEquals(List.of(), taskManager.getAllTasks(), "Задача не удалилась.");
         taskManager.removeAllSubtasks();
-        assertNull(taskManager.getSubtask(3), "Подзадача не удалилась.");
+        assertEquals(List.of(), taskManager.getAllSubtasks(), "Подзадача не удалилась.");
         taskManager.removeAllEpics();
-        assertNull(taskManager.getEpic(2), "Эпик не удалился.");
+        assertEquals(List.of(), taskManager.getAllEpics(), "Эпик не удалился.");
     }
 
     @Test
     void checkingIsSubtaskCanBeLikeEpicForSelf() {
         final Subtask subtaskFakeEpic = new Subtask("FakeEpic", "Description", TaskStatus.NEW, 4, 4);
 
-        assertEquals(-1, taskManager.addTask(subtaskFakeEpic), "Подзадача-лжеЭпик как-то добавилась. О_о");
+        assertThrows(NotFoundException.class, () -> taskManager.addTask(subtaskFakeEpic), "Подзадача-лжеЭпик как-то добавилась. О_о");
     }
 
     @Test
