@@ -5,8 +5,8 @@ import managers.TaskType;
 public class NotFoundException extends RuntimeException {
     String noTask;
 
-    public NotFoundException(TaskType Type, int id) {
-        noTask = "Не найден объект " + Type + " с id: " + id;
+    public NotFoundException(TaskType type, int id) {
+        noTask = "Не найден объект " + type + " с id: " + id;
     }
 
     @Override
