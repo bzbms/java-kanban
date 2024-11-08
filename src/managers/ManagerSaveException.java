@@ -8,6 +8,13 @@ public class ManagerSaveException extends RuntimeException {
         this.message = message;
     }
 
-    public ManagerSaveException() {
+    public ManagerSaveException(String message) {
+        this.message = message;
     }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
 }

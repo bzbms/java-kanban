@@ -36,6 +36,11 @@ public class Epic extends Task {
     }
 
     public void addSubtasksId(int id) {
+        // Почему-то при добавлении Эпика через веб-клиент его список Id Подзадач остаётся null
+        // - возникал NullPointer при добавлении Подзадачи. Так и не нашёл, почему это происходит и сделал пока так:
+        if (subtaskIds == null) {
+            subtaskIds = new ArrayList<>();
+        }
         subtaskIds.add(id);
     }
 
