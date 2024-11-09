@@ -8,23 +8,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    protected ArrayList<Integer> subtaskIds = new ArrayList<>();
+    protected ArrayList<Integer> subtaskIds;
     protected LocalDateTime endTime;
 
     public Epic(String title, String description) {
         super(title, description);
+        subtaskIds = new ArrayList<>();
     }
 
     public Epic(String title, String description, String startTime, long duration) {
         super(title, description, TaskStatus.NEW, 0, startTime, duration);
+        subtaskIds = new ArrayList<>();
     }
 
     public Epic(String title, String description, TaskStatus status, int id) {
         super(title, description, status, id);
+        subtaskIds = new ArrayList<>();
     }
 
     public Epic(String title, String description, TaskStatus status, int id, String startTime, long duration) {
         super(title, description, status, id, startTime, duration);
+        subtaskIds = new ArrayList<>();
     }
 
     public TaskType getType() {
@@ -36,11 +40,6 @@ public class Epic extends Task {
     }
 
     public void addSubtasksId(int id) {
-        // Почему-то при добавлении Эпика через веб-клиент его список Id Подзадач остаётся null
-        // - возникал NullPointer при добавлении Подзадачи. Так и не нашёл, почему это происходит и сделал пока так:
-        if (subtaskIds == null) {
-            subtaskIds = new ArrayList<>();
-        }
         subtaskIds.add(id);
     }
 

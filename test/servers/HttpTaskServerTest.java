@@ -1,6 +1,8 @@
 package servers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import managers.Managers;
 import managers.TaskManager;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -106,8 +109,7 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Task>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<Task>>() {}.getType();
         List<Task> tasks = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(tasks);
@@ -124,8 +126,7 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Epic>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<Epic>>() {}.getType();
         List<Epic> epics = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(epics);
@@ -142,8 +143,7 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Subtask>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<Subtask>>() {}.getType();
         List<Subtask> subtasks = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(subtasks);
@@ -172,37 +172,55 @@ class HttpTaskServerTest {
         assertEquals(List.of(), taskManager.getAllTasks());
     }
 
-    // Что-то не понимаю как мне тут отправить новую задачу через сеть, каким образом добавлять что-то в .POST()
-    // Что-то не вижу такого в теории, пока поспрашиваю в Пачке, но может это и не нужно или нужно не так?
-  /*  @Test
+    @Test
     void addTask() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
-        Task task2 = new Task("TAZGH2", "MEGATAZGH", "10:00 27.09.2025", 59);
+        Task task2 = new Task("TAZGH2", "MEGATAZGH","10:00 27.09.2025", 59);
         String taskS = gson.toJson(task2, Task.class);
 
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).POST().build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskS)).build();
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(201, httpResponse.statusCode());
-        assertEquals(List.of(), taskManager.getAllTasks());
+        assertEquals(List.of(task, taskManager.getTask(4)), taskManager.getAllTasks());
     }
-*/
 
-    // А тут пока затрудняюсь как мне преобразовать из Json список с разными наследниками Task в нём...
-    // epicId теряется у Подзадачи...
-/*    @Test
+    @Test
+    void updateTask() throws IOException, InterruptedException {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        task = new Task("TAZGH2", "MEGATAZGH", TaskStatus.DONE, 1, "10:00 27.09.2025", 59);
+        String taskS = gson.toJson(task, Task.class);
+
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskS)).build();
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(201, httpResponse.statusCode());
+        assertEquals(task, taskManager.getTask(1));
+    }
+
+    @Test
     void getPrioritizedTasks() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/prioritized");
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
-        Type type = new TypeToken<ArrayList<Task>>() {}.getType();
+        // Спросив, что тут делать в Пачке, мне лишь посоветовали сравнивать json'ы,
+        // сам же попытавшись через TypeToken дошёл только до такой хитрости. х)
+        // Если укажу ? extends Subtask, то в списке у всех Задач появится поле epicId,
+        // как же задать type совсем верно, я не нахожу пока...
+        Type type = new TypeToken<ArrayList<? extends Task>>() {}.getType();
         ArrayList<Task> tasks = gson.fromJson(httpResponse.body(), type);
-
+        tasks.remove(1);
+        tasks.add(1, subtask);
         assertEquals(200, httpResponse.statusCode());
         assertEquals(tasks, taskManager.getPrioritizedTasks());
+
+        String taskS = gson.toJson(taskManager.getPrioritizedTasks());
+        JsonElement jsonElement = JsonParser.parseString(taskS);
+        JsonElement jsonElement2 = JsonParser.parseString(httpResponse.body());
+        assertEquals(jsonElement, jsonElement2);
     }
-*/
 }
