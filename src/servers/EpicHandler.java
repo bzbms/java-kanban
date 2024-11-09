@@ -17,6 +17,7 @@ public class EpicHandler extends BaseHttpHandler {
         this.gson = gson;
         this.taskManager = taskManager;
     }
+
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         try {

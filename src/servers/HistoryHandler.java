@@ -14,6 +14,7 @@ public class HistoryHandler extends BaseHttpHandler {
         this.gson = gson;
         this.taskManager = taskManager;
     }
+
     @Override
     public void handle(HttpExchange httpExchange) {
         try {
