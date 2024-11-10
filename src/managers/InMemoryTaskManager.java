@@ -1,5 +1,6 @@
 package managers;
 
+import servers.NotFoundException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -54,7 +55,7 @@ public class InMemoryTaskManager implements TaskManager {
     public int addTask(Subtask task) {
         Epic epic = epics.get(task.getEpicId()); // 1. Проверяется, есть ли Эпик с ID, равным epicId у Подзадачи.
         if (epic == null) { // 2. Если таких Эпиков не создано, то метод будет завершаться на этом во избежание ошибки.
-            return -1; // А Подзадача не будет добавлена.
+            throw new NotFoundException(TaskType.EPIC, task.getEpicId()); // А Подзадача не будет добавлена.
         }
         final int id = ++uniqueId; // 3. Только после этого можно дальше продолжать обычное добавление.
         task.setId(id);
@@ -71,55 +72,60 @@ public class InMemoryTaskManager implements TaskManager {
     // ОБНОВЛЕНИЕ
     @Override
     public int updateTask(Task task) {
-        if (!tasks.containsKey(task.getId())) {
-            return -1;
+        int id = task.getId();
+        if (!tasks.containsKey(id)) {
+            throw new NotFoundException(TaskType.TASK, id);
         }
         if (task.getStartTime() == null) {
             prioritizedTasks.remove(task); // Если у задачи убрали время, значит она более не приоритетная...
         } else {
-            prioritizedTasks.remove(tasks.get(task.getId())); // Чтобы сравнивать обновлённую со всеми, нужно убрать её старый экземпляр.
+            prioritizedTasks.remove(tasks.get(id)); // Чтобы сравнивать обновлённую со всеми, нужно убрать её старый экземпляр.
             if (isTimeNotIntersects(task)) {
                 prioritizedTasks.add(task); // Если обновлённая задача не пройдёт проверку - то и зачем ей задали время...
             }
         }
-        tasks.put(task.getId(), task);
-        return task.getId();
+        tasks.put(id, task);
+        return id;
     }
 
     @Override
     public int updateTask(Epic task) {
-        if (!epics.containsKey(task.getId())) {
-            return -1;
+        int id = task.getId();
+        if (!epics.containsKey(id)) {
+            throw new NotFoundException(TaskType.EPIC, id);
         }
-        epics.put(task.getId(), task);
-        return task.getId();
+        epics.put(id, task);
+        return id;
     }
 
     @Override
     public int updateTask(Subtask task) {
-        if (!subtasks.containsKey(task.getId())) {
-            return -1;
+        int id = task.getId();
+        if (!subtasks.containsKey(id)) {
+            throw new NotFoundException(TaskType.SUBTASK, id);
         }
         if (task.getStartTime() == null) {
             prioritizedTasks.remove(task);
         } else {
-            prioritizedTasks.remove(subtasks.get(task.getId()));
+            prioritizedTasks.remove(subtasks.get(id));
             if (isTimeNotIntersects(task)) {
                 prioritizedTasks.add(task);
             }
         }
-        subtasks.put(task.getId(), task);
+        subtasks.put(id, task);
         Epic epic = epics.get(task.getEpicId());
         updateEpicStatus(epic);
         updateEpicTime(epic);
-        return task.getId();
+        return id;
     }
 
     // ПОЛУЧЕНИЕ
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
-
+        if (task == null) {
+            throw new NotFoundException(TaskType.TASK, id);
+        }
         historyManager.addTask(task);
         return task;
     }
@@ -127,7 +133,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpic(int id) {
         Epic epic = epics.get(id);
-
+        if (epic == null) {
+            throw new NotFoundException(TaskType.EPIC, id);
+        }
         historyManager.addTask(epic);
         return epic;
     }
@@ -135,7 +143,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-
+        if (subtask == null) {
+            throw new NotFoundException(TaskType.SUBTASK, id);
+        }
         historyManager.addTask(subtask);
         return subtask;
     }
@@ -161,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         ArrayList<Subtask> subtasksToShow = new ArrayList<>();
 
-        epic.getSubtasksIds().forEach(subId -> subtasksToShow.add(subtasks.get(subId))); // ТЗ-8 Замена цикла foreach на stream.
+        epic.getSubtasksIds().forEach(subId -> subtasksToShow.add(subtasks.get(subId)));
         return subtasksToShow;
     }
 
@@ -169,7 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task removeTask(int id) {
         if (tasks.get(id) == null) {
-            return null;
+            throw new NotFoundException(TaskType.TASK, id);
         }
         prioritizedTasks.remove(tasks.get(id));
         historyManager.removeTask(id);
@@ -182,9 +192,9 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
 
         if (epic == null) {
-            return null;
+            throw new NotFoundException(TaskType.EPIC, id);
         }
-        epic.getSubtasksIds().forEach(subId -> { // ТЗ-8 Замена цикла foreach на stream.
+        epic.getSubtasksIds().forEach(subId -> {
             prioritizedTasks.remove(subtasks.get(subId));
             historyManager.removeTask(subId);
             subtasks.remove(subId);
@@ -198,7 +208,7 @@ public class InMemoryTaskManager implements TaskManager {
         // Вся Подзадача временно сохраняется при удалении.
         // ID Подзадачи удаляется из Списка Эпика, иначе возникает ошибка при обновлении Статуса.
         if (subtasks.get(id) == null) {
-            return null;
+            throw new NotFoundException(TaskType.SUBTASK, id);
         }
         Subtask subtask = subtasks.remove(id);
         prioritizedTasks.remove(subtask);
@@ -213,13 +223,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllTasks() {
         tasks.values().forEach(prioritizedTasks::remove);
-        tasks.keySet().forEach(historyManager::removeTask);  // ТЗ-8 Замена цикла foreach на stream.
+        tasks.keySet().forEach(historyManager::removeTask);
         tasks.clear();
     }
 
     @Override
     public void removeAllEpics() {
-        subtasks.keySet().forEach(historyManager::removeTask);  // ТЗ-8 Замена циклов foreach на stream.
+        subtasks.keySet().forEach(historyManager::removeTask);
         epics.keySet().forEach(historyManager::removeTask);
         subtasks.clear();
         epics.clear();
@@ -228,16 +238,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllSubtasks() {
         subtasks.values().forEach(prioritizedTasks::remove);
-        subtasks.keySet().forEach(historyManager::removeTask); // ТЗ-8 Замена цикла foreach на stream.
+        subtasks.keySet().forEach(historyManager::removeTask);
         subtasks.clear();
-        epics.values().forEach(epic -> { // ТЗ-8 Замена цикла foreach на stream.
+        epics.values().forEach(epic -> {
             epic.clearSubtaskIds();
             updateEpicStatus(epic);
             updateEpicTime(epic);
         });
-        // epics.values().forEach(Epic::clearSubtaskIds); Выглядят кратко-красиво, но как объединить кратко в одну строку не нашёл. =)
-        // epics.values().forEach(this::updateEpicStatus);
-        // epics.values().forEach(this::updateEpicTime);
     }
 
     @Override
@@ -274,10 +281,10 @@ a.start <= b.end AND a.end >= b.start - преобразование
             LocalDateTime ongoingStart = addedTask.getStartTime();
             LocalDateTime ongoingEnd = addedTask.getEndTime();
             if (!(newEnd.isBefore(ongoingStart) || newStart.isAfter(ongoingEnd))) {
-                System.out.println("Время выполнения задач пересекается:\n"
+                String error = "Время выполнения задач пересекается:\n"
                         + newStart.format(formatter) + " - " + newEnd.format(formatter) + " - " + task.getTitle() + ", id=" + task.getId() + "\n"
-                        + ongoingStart.format(formatter) + " - " + ongoingEnd.format(formatter) + " - " + addedTask.getTitle() + ", id=" + addedTask.getId());
-                throw new ManagerSaveException();
+                        + ongoingStart.format(formatter) + " - " + ongoingEnd.format(formatter) + " - " + addedTask.getTitle() + ", id=" + addedTask.getId();
+                throw new ManagerSaveException(error);
             }
         }
         return true;
