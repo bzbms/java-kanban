@@ -109,7 +109,8 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Task>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Task>>() {
+        }.getType();
         List<Task> tasks = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(tasks);
@@ -126,7 +127,8 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Epic>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Epic>>() {
+        }.getType();
         List<Epic> epics = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(epics);
@@ -143,7 +145,8 @@ class HttpTaskServerTest {
 
         assertEquals(200, httpResponse.statusCode());
 
-        Type type = new TypeToken<ArrayList<Subtask>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Subtask>>() {
+        }.getType();
         List<Subtask> subtasks = gson.fromJson(httpResponse.body(), type);
 
         assertNotNull(subtasks);
@@ -176,7 +179,7 @@ class HttpTaskServerTest {
     void addTask() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
-        Task task2 = new Task("TAZGH2", "MEGATAZGH","10:00 27.09.2025", 59);
+        Task task2 = new Task("TAZGH2", "MEGATAZGH", "10:00 27.09.2025", 59);
         String taskS = gson.toJson(task2, Task.class);
 
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskS)).build();
@@ -211,7 +214,8 @@ class HttpTaskServerTest {
         // сам же попытавшись через TypeToken дошёл только до такой хитрости. х)
         // Если укажу ? extends Subtask, то в списке у всех Задач появится поле epicId,
         // как же задать type совсем верно, я не нахожу пока...
-        Type type = new TypeToken<ArrayList<? extends Task>>() {}.getType();
+        Type type = new TypeToken<ArrayList<? extends Task>>() {
+        }.getType();
         ArrayList<Task> tasks = gson.fromJson(httpResponse.body(), type);
         tasks.remove(1);
         tasks.add(1, subtask);

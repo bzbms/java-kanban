@@ -12,18 +12,15 @@ public class Epic extends Task {
     protected LocalDateTime endTime;
 
     public Epic(String title, String description) {
-        super(title, description);
-        subtaskIds = new ArrayList<>();
+        this(title, description, TaskStatus.NEW, 0, "00:00 01.01.1970", 0);
     }
 
     public Epic(String title, String description, String startTime, long duration) {
-        super(title, description, TaskStatus.NEW, 0, startTime, duration);
-        subtaskIds = new ArrayList<>();
+        this(title, description, TaskStatus.NEW, 0, "00:00 01.01.1970", 0);
     }
 
     public Epic(String title, String description, TaskStatus status, int id) {
-        super(title, description, status, id);
-        subtaskIds = new ArrayList<>();
+        this(title, description, TaskStatus.NEW, 0, "00:00 01.01.1970", 0);
     }
 
     public Epic(String title, String description, TaskStatus status, int id, String startTime, long duration) {
